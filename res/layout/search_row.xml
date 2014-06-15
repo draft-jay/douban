@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal" >
+
+	<LinearLayout
+	    android:id="@+id/linear_row_search"
+	    android:layout_width="wrap_content"
+	    android:layout_height="wrap_content"
+	    android:orientation="vertical" >
+
+	    <TextView
+	        android:id="@+id/tv_row_search_title"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_gravity="center_vertical"
+	        android:layout_marginLeft="10dp"
+	        android:text="年华岁月"
+	        android:textSize="16sp" />
+
+	    <TextView
+	        android:id="@+id/tv_row_search_rating"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_gravity="center_vertical"
+	        android:layout_marginLeft="10dp"
+	        android:text="评分：9.0"
+	        android:textSize="14sp" />
+
+	    <TextView
+	        android:id="@+id/tv_row_searc_date"
+	        android:layout_width="wrap_content"
+	        android:layout_height="wrap_content"
+	        android:layout_gravity="center_vertical"
+	        android:layout_marginLeft="10dp"
+	        android:text="2013年10"
+	        android:textSize="14sp" />
+	</LinearLayout>
+
+    <ImageView
+        android:id="@+id/img_row_search"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@android:color/background_dark"
+        />
+    </LinearLayout>
+    

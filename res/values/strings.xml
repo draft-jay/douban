@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">douban_movie_get</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="action_settings">Settings</string>
+    <string name="properties_search_movie_rating_value">value</string>
+    <string name="properties_search_movie_title">title</string>
+    <string name="properties_search_movie_images">images</string>
+    <string name="properties_search_movie_year">year</string>
+    <string name="properties_resources_movie_countries">countryes</string>
+
+</resources>
