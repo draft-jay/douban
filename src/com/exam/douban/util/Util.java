@@ -25,7 +25,7 @@ import android.util.Log;
 
 public class Util {
 
-	public String download(String urlstr) {
+	public static String download(String urlstr) {
 		StringBuffer sBuffer = new StringBuffer();
 		try {
 			URL url = new URL(urlstr);
@@ -60,7 +60,7 @@ public class Util {
 	 * @param bmurl
 	 * @return Í¼Æ¬Êý¾Ý
 	 */
-	public Bitmap downloadImg(String bmurl) {
+	public static Bitmap downloadImg(String bmurl) {
 		Bitmap bm = null;
 		InputStream is = null;
 		BufferedInputStream bis = null;

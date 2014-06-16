@@ -7,6 +7,7 @@ import java.util.zip.Inflater;
  * 自定义适配器
  */
 import com.exam.douban.activity.MovieData;
+import com.exam.douban.util.Util;
 import com.exam.douban_movie_get.R;
 
 import android.content.Context;
@@ -20,6 +21,8 @@ import android.widget.TextView;
 public class MovieAdapter extends BaseAdapter {
 	private Context context;
 	private List<MovieData> ml;
+	private boolean busy = true;
+	
 	public MovieAdapter(Context context,List<MovieData> movieList) {
 		this.context = context;
 		ml = movieList;
@@ -28,7 +31,14 @@ public class MovieAdapter extends BaseAdapter {
 	@Override
 	public int getCount() {
 		// TODO Auto-generated method stub
-		return 0;
+		return ml.size();
+	}
+	/**
+	 * 文字加载完的flag
+	 * @param busy
+	 */
+	public void setFlagBusy(boolean busy) {
+		this.busy = busy;
 	}
 
 	@Override
@@ -51,23 +61,23 @@ public class MovieAdapter extends BaseAdapter {
 	 * 若inflate（）中第一个参数有对应的类，第二个参数需要非null，不然无法显示。
 	 * @vonvertView 数据显示在这个view里
 	 * @position 集合中元素的位置
+	 * 下载图片的没有检测缓存，每次都是重新下载
 	 */
 	public View getView(int position, View convertView, ViewGroup arg2) {
 		// TODO Auto-generated method stub
-		convertView = LayoutInflater.from(context).inflate(R.layout.search_row,arg2);
+		
+		convertView = LayoutInflater.from(context).inflate(R.layout.search_row,null);
 		TextView title = (TextView) convertView.findViewById(R.id.tv_row_search_title);
 		TextView rating = (TextView) convertView.findViewById(R.id.tv_row_search_rating);
 		TextView year = (TextView) convertView.findViewById(R.id.tv_row_searc_date);
 		ImageView cover = (ImageView) convertView.findViewById(R.id.img_row_search);
-		System.out.println("--------");
 
-//		title.setText(ml.get(position).getmTitle());
-		title.setText("gangiexie");
+		title.setText(ml.get(position).getmTitle());
 		rating.setText(ml.get(position).getmRating());
 		year.setText(ml.get(position).getmYear());
+		
 		cover.setImageBitmap(ml.get(position).getmImgSmall());
-//		cover.setImageBitmap(ml.get(position).getmImg());
-//		notifyDataSetChanged();
+		
 		return convertView;
 	}
 
