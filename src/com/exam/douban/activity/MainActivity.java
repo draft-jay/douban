@@ -93,7 +93,7 @@ public class MainActivity extends Activity {
 
     protected void loading() {
     	mpd=new ProgressDialog(this);
-    	mpd.setMessage("请稍候，正在读取信息...");
+    	mpd.setMessage("Loading...");
     	mpd.show();
 		
 	}

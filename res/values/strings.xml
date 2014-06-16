@@ -3,6 +3,7 @@
 
     <string name="app_name">douban_movie_get</string>
     <string name="title_activity_main">MainActivity</string>
+    <string name="title_activity_detail">DetailActivity</string>
     <string name="action_settings">Settings</string>
     <string name="properties_search_movie_rating_value">value</string>
     <string name="properties_search_movie_title">title</string>
