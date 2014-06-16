@@ -1,6 +1,9 @@
 package com.exam.douban.activity;
 
 
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +34,7 @@ public class MainActivity extends Activity {
     private Button btn_search;
     private EditText edt_search;
     private Handler handler;
-//    private ProgressDialog mpd;
+    private ProgressDialog mpd;
     private MovieAdapter ma;
     private List<MovieData> movieList = new ArrayList<MovieData>();
     private ListView lv;
@@ -49,11 +52,17 @@ public class MainActivity extends Activity {
         edt_search = (EditText) findViewById(R.id.et_search);
         btn_search=(Button)findViewById(R.id.btn_search);
         lv = (ListView) findViewById(R.id.lv_show);
+        
+        ma = new MovieAdapter(MainActivity.this, movieList);
+        lv.setAdapter(ma);
+        
         btn_search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+            	loading();
             	new DownloadThread(edt_search.getText().toString()).start();
             }
+
         });
         
         handler=	new Handler(){
@@ -62,11 +71,11 @@ public class MainActivity extends Activity {
                 // TODO Auto-generated method stub
                 super.handleMessage(msg);
 //                movie= (MovieData) msg.obj;
-                
+//                ma.notifyDataSetChanged();
                 ma = new MovieAdapter(MainActivity.this, movieList);
                 lv.setAdapter(ma);
                 //进度条消失
-//                mpd.dismiss();
+                mpd.dismiss();
             }
         };
     }
@@ -82,27 +91,41 @@ public class MainActivity extends Activity {
 //        new DownloadThread(urlstr).start();
 //    }
 
-    private class DownloadThread extends Thread
+    protected void loading() {
+    	mpd=new ProgressDialog(this);
+    	mpd.setMessage("请稍候，正在读取信息...");
+    	mpd.show();
+		
+	}
+
+	private class DownloadThread extends Thread
     {
-        String url=null;
+        String title=null;
         
         public DownloadThread(String title) 
         {
 //				url="https://api.douban.com/v2/movie/search?q="+URLEncoder.encode(title, "utf-8");
-				url="https://api.douban.com/v2/movie/search?q="+title+"&count=10";
+				this.title=title;
         }
         public void run()
         {
-            String result = util.download(url);
-            Log.i("Download Data", result);
-			parseMovieData(result);
-			Log.i("OUTPUT", "parse completly");
+        	String ch;
+			try {
+				ch = URLEncoder.encode(title, "utf-8");
+				String uString = "http://api.douban.com/v2/movie/search?q=" + ch+"&count=10";
+				String result = util.download(uString);
+				Log.i("Download Data", result);
+				parseMovieData(result);
+				Log.i("OUTPUT", "parse completly");
 //			Toast.makeText(MainActivity.this, "下载失败", 0).show();
-            //给主线程UI界面发消息，提醒下载信息，解析信息完毕
-            Message msg=new Message();
+				//给主线程UI界面发消息，提醒下载信息，解析信息完毕
+				Message msg=new Message();
 //            msg.obj=movie;
-            handler.sendMessage(msg);
-            Log.i("OUTPUT","msg send completly");
+				handler.sendMessage(msg);
+				Log.i("OUTPUT","msg send completly");
+			} catch (UnsupportedEncodingException e) {
+				e.printStackTrace();
+			}
         }
     }
     public void parseMovieData(String str) {
@@ -126,6 +149,7 @@ public class MainActivity extends Activity {
 				movieList.add(movie);
 				movie.print();
 			}
+			
 
 		} catch (Exception e) {
 			e.printStackTrace();

@@ -24,8 +24,6 @@ import android.util.JsonReader;
 import android.util.Log;
 
 public class Util {
-	MovieData movie = new MovieData();
-	List<MovieData> movieList = new ArrayList<MovieData>();
 
 	public String download(String urlstr) {
 		StringBuffer sBuffer = new StringBuffer();

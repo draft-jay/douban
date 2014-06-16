@@ -54,19 +54,21 @@ public class MovieAdapter extends BaseAdapter {
 	 */
 	public View getView(int position, View convertView, ViewGroup arg2) {
 		// TODO Auto-generated method stub
-		convertView = LayoutInflater.from(context).inflate(R.layout.search_row, null);
+		convertView = LayoutInflater.from(context).inflate(R.layout.search_row,arg2);
 		TextView title = (TextView) convertView.findViewById(R.id.tv_row_search_title);
 		TextView rating = (TextView) convertView.findViewById(R.id.tv_row_search_rating);
 		TextView year = (TextView) convertView.findViewById(R.id.tv_row_searc_date);
 		ImageView cover = (ImageView) convertView.findViewById(R.id.img_row_search);
+		System.out.println("--------");
 
-		title.setText(ml.get(position).getmTitle());
+//		title.setText(ml.get(position).getmTitle());
+		title.setText("gangiexie");
 		rating.setText(ml.get(position).getmRating());
 		year.setText(ml.get(position).getmYear());
 		cover.setImageBitmap(ml.get(position).getmImgSmall());
-		System.out.println("--------");
 //		cover.setImageBitmap(ml.get(position).getmImg());
-		return null;
+//		notifyDataSetChanged();
+		return convertView;
 	}
 
 }
