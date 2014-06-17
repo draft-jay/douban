@@ -11,13 +11,18 @@ douban
   每次显示10条结果。
 
 BUG：
-  可以拿到豆瓣网的数据，也通过baseAdapter以arrrayList<>方式填充了数据，就是显示不到listview上。没有报错。尝试在handler的最后执行notifyDataSetChanged()，没有效果。
+  1.可以拿到豆瓣网的数据，也通过baseAdapter以arrrayList<>方式填充了数据，就是显示不到listview上。没有报错。尝试在handler的最后执行notifyDataSetChanged()，没有效果。
+    已解决:在重写了baseAdapter.getCount()之后就突然可以使用了。
+  2.arrayList<>中的数据都是最后一条添加的
+    已解决：arrayList<Movie>填充数据时候，每次都重新new一个Movie。
+  3.连续搜索的结果都保存在arrayList<Movie>里，导致上次的搜索结果不能被覆盖掉。
+     已解决：定义出类的引用变量时不new出arrayList<>,填充数据时再new出，以达到覆盖效果。
   
 可改进：
-  数据加载时间较长，将图片和文字分开加载会减少加载时间。
+  数据加载时间较长，将图片和文字分成两个线程，或者每个图片一个线程应该会加快加载速度。
   
 小结：
   没有使用第三方sdk、jar包，因为无需那么多功能，并且想体验手动开发过程。
   在相关软件的熟悉和json解析花了不少时间，原因主要应该是长时间编程之后的疲劳导致注意力下降。
-  主要技术问题都已解决，预计一天至一天半即可完成剩余功能。
+  主要技术问题都已解决，预计一天至两天即可完成剩余功能。
   
