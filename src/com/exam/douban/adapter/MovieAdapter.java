@@ -6,7 +6,7 @@ import java.util.zip.Inflater;
 /**
  * ×Ô¶¨ÒåÊÊÅäÆ÷
  */
-import com.exam.douban.activity.MovieData;
+import com.exam.douban.entity.MovieData;
 import com.exam.douban.util.Util;
 import com.exam.douban_movie_get.R;
 

@@ -1,4 +1,4 @@
-package com.exam.douban.activity;
+package com.exam.douban.entity;
 
 import android.graphics.Bitmap;
 
@@ -10,12 +10,20 @@ public class MovieData {
 	private String mRating = null;
 	private Bitmap mImgSmall = null;
 	private Bitmap mImgMedium = null;
+	private Bitmap mImgLarge = null;
 	private String mTag = null;
 	private String mCountry = null ;
-	private String pName = null;
-	private String pImg= null;
 	
 	
+
+	public Bitmap getmImgLarge() {
+		return mImgLarge;
+	}
+
+	public void setmImgLarge(Bitmap mImgLarge) {
+		this.mImgLarge = mImgLarge;
+	}
+
 	public Bitmap getmImgSmall() {
 		return mImgSmall;
 	}
@@ -81,21 +89,6 @@ public class MovieData {
 		this.mCountry = mCountry;
 	}
 
-	public String getpName() {
-		return pName;
-	}
-
-	public void setpName(String pName) {
-		this.pName = pName;
-	}
-
-	public String getpImg() {
-		return pImg;
-	}
-
-	public void setpImg(String pImg) {
-		this.pImg = pImg;
-	}
 
 	public MovieData() {
 		// TODO Auto-generated constructor stub

@@ -22,17 +22,21 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        
-        
-        <activity 
+        <activity
             android:name="com.exam.douban.activity.DetailActivity"
             android:label="@string/title_activity_detail" >
         </activity>
-        
-        
+        <activity
+            android:name="com.exam.douban.activity.HistoryActivity"
+            android:label="@string/title_activity_history" >
+        </activity>
+        <activity
+            android:name="com.exam.douban.activity.PersonDetailActivity"
+            android:label="@string/title_activity_person_detail" >
+        </activity>
     </application>
-    <uses-permission 
-        android:name="android.permission.INTERNET"
-        ></uses-permission>
+
+    <uses-permission android:name="android.permission.INTERNET" >
+    </uses-permission>
 
 </manifest>

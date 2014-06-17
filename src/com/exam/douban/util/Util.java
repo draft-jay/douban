@@ -14,18 +14,66 @@ import java.util.Map;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
-import com.exam.douban.activity.MovieData;
+import com.exam.douban.activity.DetailActivity;
+import com.exam.douban.activity.HistoryActivity;
+import com.exam.douban.activity.PersonDetailActivity;
+import com.exam.douban.entity.MovieData;
+import com.exam.douban.entity.PersonData;
 import com.exam.douban_movie_get.R;
 
+import android.content.Context;
+import android.content.Intent;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.text.Layout;
 import android.util.JsonReader;
 import android.util.Log;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.TextView;
+import android.widget.LinearLayout.LayoutParams;
 
 public class Util {
+	
+	/**
+	 * 这里Intent跳转会报错，不知如何解决
+	 * @param id
+	 * @param img
+	 * @param text
+	 * @param context
+	 * @return
+	 */
+public ViewGroup showPersonOrMoive(final String id,Bitmap img,String text,final Context context){
+		
+		LinearLayout lin = new LinearLayout(context.getApplicationContext());
+		LayoutParams lp = new LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT);
+		lin.setOrientation(LinearLayout.VERTICAL);
+		
+		ImageView iv = new ImageView(context.getApplicationContext());
+		iv.setImageBitmap(img);
+		iv.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(context.getApplicationContext(),PersonDetailActivity.class);
+				intent.putExtra("url", id);
+				context.startActivity(intent);
+			}
+		});
+		lin.addView(iv, lp);//addView(view,params)params对应view的布局
+		
+		TextView tv = new TextView(context.getApplicationContext());
+		tv.setTextAppearance(context.getApplicationContext(), android.R.attr.textAppearanceLarge);
+		tv.setText(text);
+		lin.addView(tv,lp);
+		Log.i("OUTPUT", "布局完成");
+		return lin;
+	}
 
-	public static String download(String urlstr) {
+	public String download(String urlstr) {
 		StringBuffer sBuffer = new StringBuffer();
 		try {
 			URL url = new URL(urlstr);
@@ -60,7 +108,7 @@ public class Util {
 	 * @param bmurl
 	 * @return 图片数据
 	 */
-	public static Bitmap downloadImg(String bmurl) {
+	public Bitmap downloadImg(String bmurl) {
 		Bitmap bm = null;
 		InputStream is = null;
 		BufferedInputStream bis = null;
@@ -83,6 +131,7 @@ public class Util {
 		}
 		return bm;
 	}
+
 
 	/**
 	 * 解析jsonarray数据到string

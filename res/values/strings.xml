@@ -10,5 +10,8 @@
     <string name="properties_search_movie_images">images</string>
     <string name="properties_search_movie_year">year</string>
     <string name="properties_resources_movie_countries">countryes</string>
+    <string name="title_activity_history">HistoryActivity</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="title_activity_person_detail">PersonDetailActivity</string>
 
 </resources>

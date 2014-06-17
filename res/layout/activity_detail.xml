@@ -1,46 +1,45 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/ScrollView01"
-    android:layout_width="fill_parent"
-    android:layout_height="fill_parent"
-    >
+    android:layout_width="match_parent"
+    android:layout_height="match_parent" >
 
     <LinearLayout
-        android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
         android:orientation="vertical" >
-
-        <LinearLayout
+        
+        <include layout="@layout/detail_movie_row"/>
+        
+         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:orientation="vertical" >
+            android:text="导演" 
+            android:textSize="18sp"
+            />
 
-            <LinearLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal" >
+         <LinearLayout
+             android:id="@+id/lin_director"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:layout_marginLeft="5dp"
+             android:orientation="horizontal" >
+         </LinearLayout>
 
-                <ImageView
-                    android:id="@+id/img_m"
-                    android:layout_width="289px"
-                    android:layout_height="466px"
-                    android:layout_marginLeft="5dp" 
-                    />
+         <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="演员"
+            android:textSize="18sp" />
 
-                <TextView
-                    android:id="@+id/tv_m"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="5dp"
-                    android:layout_marginTop="5dp"
-                    android:textSize="18sp"
-                    />
-                    <!--android:autoLink="web"   -->
-            </LinearLayout>
-        </LinearLayout>
-    <include layout="@layout/detail_directer_row"/>"
-
-	<include layout="@layout/detail_casts_row"/>
+         <LinearLayout
+             android:id="@+id/lin_cast"
+             android:layout_width="match_parent"
+             android:layout_height="wrap_content"
+             android:layout_marginLeft="5dp"
+             android:orientation="horizontal" >
+         </LinearLayout>
+        	
     </LinearLayout>
+    
 
 </ScrollView>

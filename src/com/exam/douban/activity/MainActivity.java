@@ -10,6 +10,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.exam.douban.adapter.MovieAdapter;
+import com.exam.douban.entity.MovieData;
 import com.exam.douban.util.Util;
 import com.exam.douban_movie_get.R;
 
@@ -29,9 +30,6 @@ import android.widget.ListView;
 
 public class MainActivity extends Activity {
 
-//    private TextView tv_title;
-//    private TextView tv_date;
-//    private TextView tv_rating;
     private Button btn_search;
     private EditText edt_search;
     private Handler handler;
@@ -40,21 +38,17 @@ public class MainActivity extends Activity {
     private List<MovieData> movieList;
     private ListView lv;
     MovieData movie ;
+	private Util util = new Util();
     
     
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-//        tv_title=(TextView)findViewById(R.id.tv_row_search_title);
-//        tv_rating=(TextView)findViewById(R.id.tv_row_search_rating);
-//        tv_date=(TextView)findViewById(R.id.tv_row_searc_date);
         edt_search = (EditText) findViewById(R.id.et_search);
         btn_search=(Button)findViewById(R.id.btn_search);
         lv = (ListView) findViewById(R.id.lv_show);
         
-//        ma = new MovieAdapter(MainActivity.this, movieList);
-//        lv.setAdapter(ma);
         Listener();
         
         
@@ -64,8 +58,6 @@ public class MainActivity extends Activity {
             public void handleMessage(Message msg) {
                 // TODO Auto-generated method stub
                 super.handleMessage(msg);
-//                movie= (MovieData) msg.obj;
-//                ma.notifyDataSetChanged();
                 ma = new MovieAdapter(MainActivity.this, movieList);
                 lv.setAdapter(ma);
                 ma.notifyDataSetChanged();
@@ -133,7 +125,7 @@ public class MainActivity extends Activity {
 			try {
 				ch = URLEncoder.encode(title, "utf-8");
 				String uString = "http://api.douban.com/v2/movie/search?q=" + ch+"&count=10";
-				String result = Util.download(uString);
+				String result = util.download(uString);
 				Log.i("Download Data", result);
 				parseMovieData(result);
 				Log.i("OUTPUT", "parse completly");
@@ -164,7 +156,7 @@ public class MainActivity extends Activity {
 				movie.setmRating(rating.getString("average"));// 表示评到几分
 
 				JSONObject images = m.getJSONObject("images");
-				movie.setmImgSmall(Util.downloadImg(images.getString("small")));
+				movie.setmImgSmall(util .downloadImg(images.getString("small")));
 				
 				
 				movieList.add(movie);
