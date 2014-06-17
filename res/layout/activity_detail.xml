@@ -11,15 +11,15 @@
         <include layout="@layout/detail_movie_row"/>
         
          <TextView
+             
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="导演" 
             android:textSize="18sp"
             />
 
          <LinearLayout
              android:id="@+id/lin_director"
-             android:layout_width="match_parent"
+             android:layout_width="wrap_content"
              android:layout_height="wrap_content"
              android:layout_marginLeft="5dp"
              android:orientation="horizontal" >
@@ -33,7 +33,7 @@
 
          <LinearLayout
              android:id="@+id/lin_cast"
-             android:layout_width="match_parent"
+             android:layout_width="wrap_content"
              android:layout_height="wrap_content"
              android:layout_marginLeft="5dp"
              android:orientation="horizontal" >

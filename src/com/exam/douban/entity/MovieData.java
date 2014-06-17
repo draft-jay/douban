@@ -1,7 +1,11 @@
 package com.exam.douban.entity;
 
 import android.graphics.Bitmap;
-
+/**
+ * 电影的数据结构
+ * @author 
+ *
+ */
 public class MovieData {
 	
 	private String mTitle=null;

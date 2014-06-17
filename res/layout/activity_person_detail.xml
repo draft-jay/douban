@@ -15,12 +15,12 @@
         android:layout_width="fill_parent"
         android:orientation="vertical" >
         
-        <include layout="@layout/detail_movie_row"/>
-
+        <!--  <include layout="@layout/detail_movie_row"/>-->
+		
         <LinearLayout 
-            android:id="@+id/lin_pserson_m"
+        android:id="@+id/lin_pserson_m"
         android:layout_height="fill_parent"
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:orientation="horizontal" 
             >
             

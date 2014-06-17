@@ -79,7 +79,7 @@ public class DetailActivity extends Activity {
 					+ movie.getmYear() + "\n\n" + movie.getmTag());
 			// imageView.setImageBitmap(bm);
 			mImg.setImageBitmap(movie.getmImgLarge());
-			
+			//动态布局，这两个for循环打包成一个方法在intent跳转时候会报错，原因不明
 			for (int i = 0; i < directorList.size(); i++) {
 				String id = directorList.get(i).getId();
 				Bitmap img = directorList.get(i).getImg();
@@ -155,7 +155,7 @@ public class DetailActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				Intent intent = new Intent(getApplicationContext(),PersonDetailActivity.class);
-				intent.putExtra("url", id);
+				intent.putExtra("id", id);
 				startActivity(intent);
 			}
 		});
@@ -179,7 +179,6 @@ public class DetailActivity extends Activity {
 			try {
 				String result = util.download(url);
 //				String result = util.download("https://api.douban.com/v2/movie/subject/2049435");
-				
 				Log.i("OUTPUT", "detail download completed");
 				Log.i("Download Data", result);
 				parseDetailInfo(result);
@@ -193,12 +192,12 @@ public class DetailActivity extends Activity {
 			}
 		}
 
-		private void parseDetailInfo(String str) {
+		public void parseDetailInfo(String str) {
 			// TODO Auto-generated method stub
 			try {
 				JSONObject s = new JSONObject(str);
-				castList = parsePersonArray(s, "casts");
-				directorList = parsePersonArray(s, "directors");
+				castList = util.parsePersonArray(s, "casts");
+				directorList = util.parsePersonArray(s, "directors");
 
 				movie.setmYear(s.getString("year"));
 				JSONObject rating = s.getJSONObject("rating");
@@ -221,32 +220,6 @@ public class DetailActivity extends Activity {
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
-		}
-		/**
-		 * 解析出演员和导演的信息，因为这两个信息格式是一样的
-		 * @param s
-		 * @param title
-		 * @return
-		 */
-		public List<PersonData> parsePersonArray(JSONObject s, String title) {
-			List<PersonData> avatars = new ArrayList<PersonData>();
-			JSONArray dir;
-			try {
-				dir = s.getJSONArray(title);
-				for (int j = 0; j < dir.length(); j++) {
-					JSONObject d = dir.getJSONObject(j);
-					PersonData cast = new PersonData();
-					cast.setName(d.getString("name"));
-					JSONObject a = d.getJSONObject("avatars");// 演员头像
-					cast.setImg(util.downloadImg(a.getString("medium")));
-					cast.setId(d.getString("id"));// 演员id
-					avatars.add(cast);
-				}
-			} catch (JSONException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			return avatars;
 		}
 	}
 }

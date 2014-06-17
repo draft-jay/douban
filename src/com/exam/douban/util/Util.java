@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.exam.douban.activity.DetailActivity;
@@ -36,39 +37,46 @@ import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.LinearLayout.LayoutParams;
-
+/**
+ * 工具类
+ */
 public class Util {
-	
+
 	/**
 	 * 这里Intent跳转会报错，不知如何解决
+	 * 
 	 * @param id
 	 * @param img
 	 * @param text
 	 * @param context
 	 * @return
 	 */
-public ViewGroup showPersonOrMoive(final String id,Bitmap img,String text,final Context context){
-		
+	public ViewGroup showPersonOrMoive(final String id, Bitmap img,
+			String text, final Context context) {
+
 		LinearLayout lin = new LinearLayout(context.getApplicationContext());
-		LayoutParams lp = new LayoutParams(LayoutParams.WRAP_CONTENT,LayoutParams.WRAP_CONTENT);
+		LayoutParams lp = new LayoutParams(LayoutParams.WRAP_CONTENT,
+				LayoutParams.WRAP_CONTENT);
 		lin.setOrientation(LinearLayout.VERTICAL);
-		
+
 		ImageView iv = new ImageView(context.getApplicationContext());
 		iv.setImageBitmap(img);
 		iv.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				Intent intent = new Intent(context.getApplicationContext(),PersonDetailActivity.class);
+				Intent intent = new Intent(context.getApplicationContext(),
+						PersonDetailActivity.class);
 				intent.putExtra("url", id);
 				context.startActivity(intent);
 			}
 		});
-		lin.addView(iv, lp);//addView(view,params)params对应view的布局
-		
+		lin.addView(iv, lp);// addView(view,params)params对应view的布局
+
 		TextView tv = new TextView(context.getApplicationContext());
-		tv.setTextAppearance(context.getApplicationContext(), android.R.attr.textAppearanceLarge);
+		tv.setTextAppearance(context.getApplicationContext(),
+				android.R.attr.textAppearanceLarge);
 		tv.setText(text);
-		lin.addView(tv,lp);
+		lin.addView(tv, lp);
 		Log.i("OUTPUT", "布局完成");
 		return lin;
 	}
@@ -132,6 +140,65 @@ public ViewGroup showPersonOrMoive(final String id,Bitmap img,String text,final 
 		return bm;
 	}
 
+	/**
+	 * 解析出演员和导演的信息，因为这两个信息格式是一样的
+	 * 
+	 * @param s
+	 * @param title
+	 * @return List<PersonData>
+	 */
+	public List<PersonData> parsePersonArray(JSONObject s, String title) {
+		List<PersonData> avatars = new ArrayList<PersonData>();
+		JSONArray dir;
+		try {
+			dir = s.getJSONArray(title);
+			for (int j = 0; j < dir.length(); j++) {
+				JSONObject d = dir.getJSONObject(j);
+				PersonData cast = new PersonData();
+				cast.setName(d.getString("name"));
+				JSONObject a = d.getJSONObject("avatars");// 演员头像
+				cast.setImg(downloadImg(a.getString("medium")));
+				cast.setId(d.getString("id"));// 演员id
+				avatars.add(cast);
+			}
+		} catch (JSONException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return avatars;
+	}
+	/**
+	 * 解析电影条目信息（简版）
+	 * @param s
+	 * @param str
+	 * @return 
+	 */
+	public List<MovieData> parseMovieData(JSONObject s, String str) {
+
+		List<MovieData> list = new ArrayList<MovieData>();
+
+		try {
+			JSONArray total = s.getJSONArray(str);
+			for (int i = 0; i < total.length(); i++) {
+				MovieData movie = new MovieData();
+				JSONObject m = total.getJSONObject(i);
+				movie.setmTitle(m.getString("title"));
+				movie.setmId(m.getString("id"));
+				movie.setmYear(m.getString("year"));
+
+				JSONObject rating = m.getJSONObject("rating");
+				movie.setmRating(rating.getString("average"));// 表示评到几分
+
+				JSONObject images = m.getJSONObject("images");
+				movie.setmImgSmall(downloadImg(images.getString("small")));
+				list.add(movie);
+				movie.print();
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return list;
+	}
 
 	/**
 	 * 解析jsonarray数据到string
@@ -160,5 +227,5 @@ public ViewGroup showPersonOrMoive(final String id,Bitmap img,String text,final 
 	 *            json格式的字符串
 	 * @return MovieData
 	 */
-	
+
 }

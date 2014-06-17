@@ -35,9 +35,8 @@ public class MainActivity extends Activity {
     private Handler handler;
     private ProgressDialog mpd;
     private MovieAdapter ma;
-    private List<MovieData> movieList;
+    private List<MovieData> movieList = new ArrayList<MovieData>();;
     private ListView lv;
-    MovieData movie ;
 	private Util util = new Util();
     
     
@@ -127,7 +126,10 @@ public class MainActivity extends Activity {
 				String uString = "http://api.douban.com/v2/movie/search?q=" + ch+"&count=10";
 				String result = util.download(uString);
 				Log.i("Download Data", result);
-				parseMovieData(result);
+				
+				JSONObject s = new JSONObject(result);
+				movieList = util.parseMovieData(s,"subjects");
+				
 				Log.i("OUTPUT", "parse completly");
 //			Toast.makeText(MainActivity.this, "下载失败", 0).show();
 				//给主线程UI界面发消息，提醒下载信息，解析信息完毕
@@ -135,38 +137,11 @@ public class MainActivity extends Activity {
 //            msg.obj=movie;
 				handler.sendMessage(msg);
 				Log.i("OUTPUT","msg send completly");
-			} catch (UnsupportedEncodingException e) {
+			} catch (Exception e) {
 				e.printStackTrace();
 			}
         }
     }
-    public void parseMovieData(String str) {
-    	movieList = new ArrayList<MovieData>();
-		try {
-			JSONObject s = new JSONObject(str);
-			JSONArray total = s.getJSONArray("subjects");
-			for (int i = 0; i < total.length(); i++) {
-				movie = new MovieData();
-				JSONObject m = total.getJSONObject(i);
-				movie.setmTitle(m.getString("title"));
-				movie.setmId(m.getString("id"));
-				movie.setmYear(m.getString("year"));
-
-				JSONObject rating = m.getJSONObject("rating");
-				movie.setmRating(rating.getString("average"));// 表示评到几分
-
-				JSONObject images = m.getJSONObject("images");
-				movie.setmImgSmall(util .downloadImg(images.getString("small")));
-				
-				
-				movieList.add(movie);
-				movie.print();
-			}
-			
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
+    
 
 }
