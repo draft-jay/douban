@@ -6,9 +6,11 @@ import java.util.List;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import com.exam.douban.entity.MovieData;
 import com.exam.douban.entity.PersonData;
+import com.exam.douban.entity.Properties;
 import com.exam.douban.util.Util;
 import com.exam.douban_movie_get.R;
 
@@ -23,6 +25,7 @@ import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.View.OnClickListener;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -31,21 +34,26 @@ import android.widget.LinearLayout.LayoutParams;
 public class PersonDetailActivity extends Activity {
 	private TextView Info;// 显示 影人基本信息的 文本控件
 	private ImageView mImg;// 显示图片的图片控件
-	private LinearLayout lin_works;// 
+	private LinearLayout lin_works;//
+	// private List<MovieData> works = new ArrayList<MovieData>();
 
 	// private Button button;// "返回 "按钮
 	private ProgressDialog proDialog;
-	private PersonData person = new PersonData();
+	private PersonData person;
 	private String url;// 电影的具体url
 	private Util util = new Util();
+	private Button btn_back;
+	private Button btn_home;
+	private TextView tv_wokes;
 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_person_detail);
+
 		initView();
 		initData();
-		// addListener();
 
+		util.backClick(btn_back, btn_home, PersonDetailActivity.this);
 		new Thread(new Load()).start();
 		proDialog.show();
 	}
@@ -57,7 +65,9 @@ public class PersonDetailActivity extends Activity {
 		Info = (TextView) findViewById(R.id.tv_m);
 		mImg = (ImageView) findViewById(R.id.img_m);
 		lin_works = (LinearLayout) findViewById(R.id.lin_pserson_m);
-		// button = (Button) findViewById(R.id.button);
+		tv_wokes = (TextView) findViewById(R.id.tv_works);
+		btn_back = (Button) findViewById(R.id.btn_back);
+		btn_home = (Button) findViewById(R.id.btn_home);
 
 		proDialog = new ProgressDialog(this);
 		proDialog.setMessage("Loading...");
@@ -75,22 +85,27 @@ public class PersonDetailActivity extends Activity {
 	}
 
 	Handler handler = new Handler() {
-
+		//返回的数据里都没有birthday这个字段
 		@Override
 		public void handleMessage(Message message) {
-			Info.setText( person.getName()+ "\n" + person.getName_en() + "\n\n"
-					+ person.getBirthday() + "\n" + person.getBorn_place());
-			// imageView.setImageBitmap(bm);
-			mImg.setImageBitmap(person.getImgLarge());
-			//动态布局
-			ArrayList<MovieData> works = (ArrayList<MovieData>) person.getWorks();
+			Info.setText(person.getName() + "\n" + person.getName_en() + "\n\n"
+					+ "生日：" +person.getBirthday()+ "\n" + "出生地" + person.getBorn_place());
+			mImg.setImageBitmap(person.getImg());
+			
+			// 动态布局
+			ArrayList<MovieData> works = (ArrayList<MovieData>)person.getWorks();
+			System.out.println("works ---  "+works.toString());
 			for (int i = 0; i < works.size(); i++) {
-				String id = works.get(i).getmId();
-				Bitmap img = works.get(i).getmImgSmall();
-				String name = works.get(i).getmTitle();
+				String id = works.get(i).getId();
+				Bitmap img = works.get(i).getImg();
+				String name = works.get(i).getTitle();
 				ViewGroup layout = showPersonOrMoive(id, img, name);
 				lin_works.addView(layout);
+				System.out.println("dongtaibuju----"+i);
 			}
+			
+			tv_wokes.setVisibility(View.VISIBLE);
+			proDialog.dismiss();
 		};
 	};
 
@@ -117,8 +132,9 @@ public class PersonDetailActivity extends Activity {
 			@Override
 			public void onClick(View v) {
 				Intent intent = new Intent(getApplicationContext(),
-						PersonDetailActivity.class);
-				intent.putExtra("url", id);
+						DetailActivity.class);
+				intent.putExtra("id", id);
+				util.saveHistory(getApplicationContext(), Properties.HISTORY_NAME_MOVIE, id);
 				startActivity(intent);
 			}
 		});
@@ -127,7 +143,11 @@ public class PersonDetailActivity extends Activity {
 		TextView tv = new TextView(getApplicationContext());
 		tv.setTextAppearance(getApplicationContext(),
 				android.R.attr.textAppearanceLarge);
+		tv.setWidth(155);
 		tv.setText(text);
+		// if(text.length()>4){
+		// tv.setText(text.substring(0,4)+"...");
+		// }
 		lin.addView(tv, lp);
 		Log.i("OUTPUT", "布局完成");
 		return lin;
@@ -147,11 +167,11 @@ public class PersonDetailActivity extends Activity {
 
 				Log.i("OUTPUT", "detail personData download completed");
 				Log.i("Download Data", result);
-				
 				parseDetailInfo(result);
-				Log.i("OUTPUT", "detail parse completed");
-
+				Log.i("OUTPUT", "detail person parse completed");
 				handler.sendMessage(new Message());
+				Log.i("OUTPUT", "msg sent completed");
+				
 
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -161,31 +181,33 @@ public class PersonDetailActivity extends Activity {
 
 		/**
 		 * 解析电影详情信息并保存到列表
+		 * 
 		 * @param str
-		 * @param works 影人作品，最多五个
+		 * @param works
+		 *            影人作品，最多五个
 		 */
-		private void parseDetailInfo(String str) {
-			
-			List<MovieData> works = new ArrayList<MovieData>();
-			
+		private void parseDetailInfo(String result) {
+
+			// 这里和搜索电影返回的数据格式和豆瓣上写的不一样，作品条目不同，subject不是数组，
+			person = new PersonData();
 			try {
-				JSONObject s = new JSONObject(str);
-				works = util.parseMovieData(s, "works");//影人作品，最多五个
-				
-				JSONObject images = s.getJSONObject("avatars");//头像
-				person.setImgLarge(util.downloadImg(images.getString("large")));
-				person.setBirthday(s.getString("birthday"));
+				JSONObject s = new JSONObject(result);
+
+				person.setWorks(util.parseMovieData(s, "works","medium"));
+				Log.i("OUTPUT", "works parse completly");
+
+				JSONObject images1 = s.getJSONObject("avatars");// 头像
+				person.setImg(util.downloadImg(images1.getString("medium")));
+				// person.setBirthday(s.getString("birthday"));
 				person.setName(s.getString("name"));
 				person.setName_en(s.getString("name_en"));
 				person.setGender(s.getString("gender"));
 				person.setBorn_place(s.getString("born_place"));
-				person.setWorks(works);
-
+				person.print();
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
 		}
 
-		
 	}
 }

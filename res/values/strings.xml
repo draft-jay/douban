@@ -12,6 +12,9 @@
     <string name="properties_resources_movie_countries">countryes</string>
     <string name="title_activity_history">HistoryActivity</string>
     <string name="hello_world">Hello world!</string>
+    <string name="history_xml_movie">MovieHistory</string>
+    <string name="history_xml_person">PersonHistory</string>
     <string name="title_activity_person_detail">PersonDetailActivity</string>
+    
 
 </resources>

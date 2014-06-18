@@ -11,17 +11,23 @@ import org.json.JSONObject;
 
 import com.exam.douban.adapter.MovieAdapter;
 import com.exam.douban.entity.MovieData;
+import com.exam.douban.entity.Properties;
+import com.exam.douban.util.SharedPreferencesUtil;
 import com.exam.douban.util.Util;
 import com.exam.douban_movie_get.R;
 
 import android.os.Bundle;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
+import android.view.View.OnClickListener;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
@@ -31,11 +37,12 @@ import android.widget.ListView;
 public class MainActivity extends Activity {
 
     private Button btn_search;
+    private Button btn_history;
     private EditText edt_search;
     private Handler handler;
     private ProgressDialog mpd;
     private MovieAdapter ma;
-    private List<MovieData> movieList = new ArrayList<MovieData>();;
+    private List<MovieData> movieList = new ArrayList<MovieData>();
     private ListView lv;
 	private Util util = new Util();
     
@@ -46,12 +53,9 @@ public class MainActivity extends Activity {
         setContentView(R.layout.activity_main);
         edt_search = (EditText) findViewById(R.id.et_search);
         btn_search=(Button)findViewById(R.id.btn_search);
+        btn_history=(Button)findViewById(R.id.btn_history);
         lv = (ListView) findViewById(R.id.lv_show);
-        
         Listener();
-        
-        
-        
         handler=	new Handler(){
             @Override
             public void handleMessage(Message msg) {
@@ -78,11 +82,22 @@ public class MainActivity extends Activity {
 //    }
 
     private void Listener() {
+    	 btn_history.setOnClickListener(new OnClickListener() {
+ 			@Override
+ 			public void onClick(View arg0) {
+ 				// TODO Auto-generated method stub
+ 				Intent i = new Intent(getApplicationContext(), HistoryActivity.class);
+ 				startActivity(i);
+ 			}
+ 		});
     	btn_search.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
             	loading();
+            	InputMethodManager imm=(InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE); 
+				imm.hideSoftInputFromWindow(edt_search.getWindowToken(), 0);
             	new DownloadThread(edt_search.getText().toString()).start();
+            	
             }
 
         });
@@ -92,14 +107,19 @@ public class MainActivity extends Activity {
 			public void onItemClick(AdapterView<?> arg0, View arg1, int position,
 					long id) {
 				MovieData m = movieList.get(position);
+				
+				util.saveHistory(MainActivity.this, Properties.HISTORY_NAME_MOVIE, m.getId());
+				System.out.println("ma.getInfo()----"+m.getId());
+				
 				Intent intent = new Intent();
 				intent.setClass(MainActivity.this, DetailActivity.class);
-				intent.putExtra("id", m.getmId());
+				intent.putExtra("id", m.getId());
 				startActivity(intent);
 				
 			}
 		});
 		
+        
 	}
 
 	protected void loading() {
@@ -128,7 +148,7 @@ public class MainActivity extends Activity {
 				Log.i("Download Data", result);
 				
 				JSONObject s = new JSONObject(result);
-				movieList = util.parseMovieData(s,"subjects");
+				movieList = util.parseMovieData(s,"subjects","small");
 				
 				Log.i("OUTPUT", "parse completly");
 //			Toast.makeText(MainActivity.this, "œ¬‘ÿ ß∞‹", 0).show();

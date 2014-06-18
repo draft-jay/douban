@@ -7,15 +7,14 @@ import android.graphics.Bitmap;
  * 影人数据结构
  */
 public class PersonData {
-	private String name;
-	private Bitmap img;
-	private Bitmap imgLarge;
-	private String id;
-	private String name_en;
-	private String gender;
-	private String birthday;
-	private String born_place;
-	private List<MovieData> works;
+	private String name=null;
+	private Bitmap img=null;
+	private String id=null;
+	private String name_en=null;
+	private String gender=null;
+	private String birthday = "不详";
+	private String born_place=null;
+	private List<MovieData> works=null;
 	
 	
 	
@@ -24,12 +23,6 @@ public class PersonData {
 	}
 	public void setWorks(List<MovieData> works) {
 		this.works = works;
-	}
-	public Bitmap getImgLarge() {
-		return imgLarge;
-	}
-	public void setImgLarge(Bitmap imgLarge) {
-		this.imgLarge = imgLarge;
 	}
 	public String getName_en() {
 		return name_en;
@@ -72,6 +65,11 @@ public class PersonData {
 	}
 	public void setId(String id) {
 		this.id = id;
+	}
+	public void print() {
+		// TODO Auto-generated method stub
+		System.out.println(getName() + "\n" + getName_en() + "\n\n"
+				+ getBirthday() + "\n" + getBorn_place());
 	}
 
 	

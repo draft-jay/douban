@@ -11,7 +11,9 @@ import java.util.List;
 import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Bitmap;
 import android.util.Base64;
+import android.widget.AdapterView.OnItemClickListener;
 
 public class SharedPreferencesUtil {  
     private static final String SAVETAG = "list";  
@@ -28,7 +30,7 @@ public class SharedPreferencesUtil {
                 context.getSharedPreferences(shaPreName, Activity.MODE_PRIVATE);  
         SharedPreferences.Editor editor = sharedPreferences.edit();  
         List<Object> list = getObject(context,shaPreName);  
-        if(null == list){  
+        if(list == null){  
             list = new ArrayList<Object>();  
         }  
         list.add(object);  
@@ -84,5 +86,6 @@ public class SharedPreferencesUtil {
             }  
         }  
         return null;  
-    }  
+    }
+
 }  

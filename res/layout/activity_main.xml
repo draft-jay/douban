@@ -12,11 +12,10 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" 
+        android:layout_height="wrap_content"
         android:background="@android:color/darker_gray"
-        android:orientation="horizontal"
-        >
-        
+        android:orientation="horizontal" >
+
         <EditText
             android:id="@+id/et_search"
             android:layout_width="214dp"
@@ -28,29 +27,43 @@
             android:singleLine="true"
             android:textSize="18sp" />
 
-        <Button 
+        <Button
             android:id="@+id/btn_search"
-        	android:layout_width="wrap_content"
-        	android:layout_height="wrap_content"
-        	android:layout_marginLeft="18dp"
-        	android:background="@android:color/darker_gray"
-        	android:gravity="center_vertical"
-        	android:layout_gravity="center_vertical"
-        	android:text="GO"
-        	android:textSize="16sp"
-        	android:textStyle="bold"
-        	android:layout_weight="0"
-            />
-            
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_weight="0"
+            android:layout_gravity="center_vertical"
+            android:layout_marginLeft="16dp"
+            android:background="@android:color/darker_gray"
+            android:text="GO"
+            android:textSize="24sp"
+            android:textStyle="bold" />
     </LinearLayout>
 
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical" >
+    <FrameLayout
+        android:id="@+id/FrameLayout1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" >
 
-            <include layout="@layout/movie_list"/>
+        <include
+            android:id="@+id/include1"
+            layout="@layout/movie_list" />
+        
+            <Button
+                android:id="@+id/btn_history"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_gravity="end"
+                android:layout_marginTop="5dp"
+                android:gravity="center"
+                android:text="访问历史"
+                android:textSize="16sp"
+                android:textStyle="bold" 
+                android:background="@android:color/darker_gray" />
+            
 
-        </LinearLayout>
+
+
+    </FrameLayout>
 
 </LinearLayout>

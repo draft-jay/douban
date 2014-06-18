@@ -12,6 +12,7 @@ import org.json.JSONObject;
 
 import com.exam.douban.entity.PersonData;
 import com.exam.douban.entity.MovieData;
+import com.exam.douban.entity.Properties;
 import com.exam.douban.util.Util;
 import com.exam.douban_movie_get.R;
 
@@ -30,6 +31,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.LinearLayout.LayoutParams;
@@ -48,11 +50,13 @@ public class DetailActivity extends Activity {
 	private ImageView mImg;// 显示图片的图片控件
 	private LinearLayout lin_director;//导演的四个显示位
 	private LinearLayout lin_cast;//演员的四个显示位
-
+	private Button btn_back;
+	private Button btn_home;
+	private TextView tv_dir;
+	private TextView tv_cast;
 	// private Button button;// "返回 "按钮
 //	private List<MovieData> movieList; // 电影所有信息的泛型LIST
-	private List<PersonData> castList;
-	private List<PersonData> directorList;
+	private List<PersonData> list;
 	private ProgressDialog proDialog;
 	private String url;// 电影的具体url
 	private Util util = new Util();
@@ -64,38 +68,40 @@ public class DetailActivity extends Activity {
 		setContentView(R.layout.activity_detail);
 		initView();
 		initData();
-//		addListener();
+		util.backClick(btn_back,btn_home,DetailActivity.this);
 
 		new Thread(new LoadData()).start();
 		proDialog.show();
 	}
-	
 
 	Handler handler = new Handler() {
 		
 		@Override
 		public void handleMessage(Message message) {
-			mInfo.setText(movie.getmTitle() + "\n" + movie.getmRating() + "\n"
-					+ movie.getmYear() + "\n\n" + movie.getmTag());
-			// imageView.setImageBitmap(bm);
-			mImg.setImageBitmap(movie.getmImgLarge());
+			mInfo.setText(movie.getTitle() + "\n" + movie.getRating() + "\n"
+					+ movie.getYear() + "\n\n" + movie.getTag());
+			mImg.setImageBitmap(movie.getImg());
+			list = movie.getDirList();
 			//动态布局，这两个for循环打包成一个方法在intent跳转时候会报错，原因不明
-			for (int i = 0; i < directorList.size(); i++) {
-				String id = directorList.get(i).getId();
-				Bitmap img = directorList.get(i).getImg();
-				String name = directorList.get(i).getName();
+			for (int i = 0; i < list.size(); i++) {
+				String id = list.get(i).getId();
+				Bitmap img = list.get(i).getImg();
+				String name = list.get(i).getName();
 				ViewGroup layout = showPersonOrMoive(id, img,name);
 				lin_director.addView(layout);
 			}
-			for (int j = 0; j < castList.size(); j++) {
-				String id = castList.get(j).getId();
-				Bitmap img = castList.get(j).getImg();
-				String name = castList.get(j).getName();
+			list = movie.getCastList();
+			for (int j = 0; j < list.size(); j++) {
+				String id = list.get(j).getId();
+				Bitmap img = list.get(j).getImg();
+				String name = list.get(j).getName();
 				ViewGroup layout = showPersonOrMoive(id, img,name);
 				lin_cast.addView(layout);
 			}
-			System.out.println("directorList.getClass().getName()变量类型-----"+directorList.getClass().getName());
-			parse(directorList);
+//			System.out.println("directorList.getClass().getName()变量类型-----"+list.getClass().getName());
+//			parse(directorList);
+			tv_cast.setVisibility(View.VISIBLE);
+			tv_dir.setVisibility(View.VISIBLE);
 			proDialog.dismiss();
 		}
 		/**
@@ -119,7 +125,10 @@ public class DetailActivity extends Activity {
 		mImg = (ImageView) findViewById(R.id.img_m);
 		lin_director = (LinearLayout) findViewById(R.id.lin_director);
 		lin_cast = (LinearLayout) findViewById(R.id.lin_cast);
-		// button = (Button) findViewById(R.id.button);
+		btn_back = (Button) findViewById(R.id.btn_back);
+		btn_home = (Button) findViewById(R.id.btn_home);
+		tv_cast = (TextView) findViewById(R.id.tv_cast);
+		tv_dir = (TextView) findViewById(R.id.tv_dir);
 
 		proDialog = new ProgressDialog(this);
 		proDialog.setMessage("Loading...");
@@ -133,6 +142,7 @@ public class DetailActivity extends Activity {
 		Bundle extra = getIntent().getExtras();
 		String id = extra.getString("id");
 		url = "https://api.douban.com/v2/movie/subject/" + id;
+		System.out.println("id----"+id);
 
 	}
 	
@@ -156,6 +166,7 @@ public class DetailActivity extends Activity {
 			public void onClick(View v) {
 				Intent intent = new Intent(getApplicationContext(),PersonDetailActivity.class);
 				intent.putExtra("id", id);
+				util.saveHistory(getApplicationContext(), Properties.HISTORY_NAME_PERSON, id);
 				startActivity(intent);
 			}
 		});
@@ -164,6 +175,7 @@ public class DetailActivity extends Activity {
 		TextView tv = new TextView(getApplicationContext());
 		tv.setTextAppearance(getApplicationContext(), android.R.attr.textAppearanceLarge);
 		tv.setText(text);
+		tv.setWidth(155);
 		lin.addView(tv,lp);
 		Log.i("OUTPUT", "布局完成");
 		return lin;
@@ -196,16 +208,16 @@ public class DetailActivity extends Activity {
 			// TODO Auto-generated method stub
 			try {
 				JSONObject s = new JSONObject(str);
-				castList = util.parsePersonArray(s, "casts");
-				directorList = util.parsePersonArray(s, "directors");
+				movie.setCastList(util.parsePersonArray(s, "casts"));
+				movie.setDirList(util.parsePersonArray(s, "directors"));
 
-				movie.setmYear(s.getString("year"));
+				movie.setYear(s.getString("year"));
 				JSONObject rating = s.getJSONObject("rating");
-				movie.setmRating(rating.getString("average"));// 表示评到几分
+				movie.setRating(rating.getString("average"));// 表示评到几分
 
 				JSONObject images = s.getJSONObject("images");
-				movie.setmImgLarge(util.downloadImg(images.getString("large")));
-				movie.setmTitle(s.getString("title"));
+				movie.setImg(util.downloadImg(images.getString("large")));
+				movie.setTitle(s.getString("title"));
 				JSONArray genres = s.getJSONArray("genres");
 				StringBuffer buffer = new StringBuffer();
 				for (int j = 0; j < genres.length(); j++) {
@@ -215,7 +227,7 @@ public class DetailActivity extends Activity {
 						buffer = buffer.append(genres.getString(j)+" / ");
 						
 				}
-				movie.setmTag(buffer.toString());
+				movie.setTag(buffer.toString());
 				
 			} catch (Exception e) {
 				e.printStackTrace();

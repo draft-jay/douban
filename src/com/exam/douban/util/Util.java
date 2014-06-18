@@ -17,13 +17,16 @@ import org.json.JSONObject;
 
 import com.exam.douban.activity.DetailActivity;
 import com.exam.douban.activity.HistoryActivity;
+import com.exam.douban.activity.MainActivity;
 import com.exam.douban.activity.PersonDetailActivity;
 import com.exam.douban.entity.MovieData;
 import com.exam.douban.entity.PersonData;
 import com.exam.douban_movie_get.R;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -33,14 +36,35 @@ import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.LinearLayout.LayoutParams;
+
 /**
  * 工具类
  */
 public class Util {
+
+	/**
+	 * 保存正在浏览的条目
+	 * @param context
+	 * @param type
+	 * @param movieInfo
+	 */
+	public void saveHistory(Context context, String type, String movieInfo) {
+		SharedPreferences sharedPreferences = context.getSharedPreferences(
+				type, Activity.MODE_APPEND);
+		SharedPreferences.Editor editor = sharedPreferences.edit();
+		editor.putString(movieInfo, movieInfo);
+		Log.i("movieInfo", movieInfo);
+
+		if (editor.commit())
+			Log.i("MainActivity", "历史记录成功");
+
+		// 读取历史记录
+	}
 
 	/**
 	 * 这里Intent跳转会报错，不知如何解决
@@ -156,10 +180,13 @@ public class Util {
 				JSONObject d = dir.getJSONObject(j);
 				PersonData cast = new PersonData();
 				cast.setName(d.getString("name"));
+
 				JSONObject a = d.getJSONObject("avatars");// 演员头像
 				cast.setImg(downloadImg(a.getString("medium")));
+
 				cast.setId(d.getString("id"));// 演员id
 				avatars.add(cast);
+
 			}
 		} catch (JSONException e) {
 			// TODO Auto-generated catch block
@@ -167,13 +194,18 @@ public class Util {
 		}
 		return avatars;
 	}
+
 	/**
 	 * 解析电影条目信息（简版）
+	 * 
 	 * @param s
 	 * @param str
-	 * @return 
+	 * @param imgType
+	 *            下载的电影尺寸
+	 * @return
 	 */
-	public List<MovieData> parseMovieData(JSONObject s, String str) {
+	public List<MovieData> parseMovieData(JSONObject s, String str,
+			String imgType) {
 
 		List<MovieData> list = new ArrayList<MovieData>();
 
@@ -181,16 +213,21 @@ public class Util {
 			JSONArray total = s.getJSONArray(str);
 			for (int i = 0; i < total.length(); i++) {
 				MovieData movie = new MovieData();
-				JSONObject m = total.getJSONObject(i);
-				movie.setmTitle(m.getString("title"));
-				movie.setmId(m.getString("id"));
-				movie.setmYear(m.getString("year"));
+				JSONObject m;
+				if (str.equals("works")) {
+					JSONObject mov = total.getJSONObject(i);
+					m = mov.getJSONObject("subject");
+				} else
+					m = total.getJSONObject(i);
+				movie.setTitle(m.getString("title"));
+				movie.setId(m.getString("id"));
+				movie.setYear(m.getString("year"));
 
 				JSONObject rating = m.getJSONObject("rating");
-				movie.setmRating(rating.getString("average"));// 表示评到几分
+				movie.setRating(rating.getString("average"));// 表示评到几分
 
 				JSONObject images = m.getJSONObject("images");
-				movie.setmImgSmall(downloadImg(images.getString("small")));
+				movie.setImg(downloadImg(images.getString(imgType)));
 				list.add(movie);
 				movie.print();
 			}
@@ -198,6 +235,32 @@ public class Util {
 			e.printStackTrace();
 		}
 		return list;
+	}
+
+	/**
+	 * 顶部返回按钮的监听方法
+	 * 
+	 * @param back
+	 * @param home
+	 * @param context
+	 */
+	public void backClick(Button back, Button home, final Context context) {
+		// TODO Auto-generated method stub
+		home.setOnClickListener(new OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				context.startActivity(new Intent(context, MainActivity.class));
+				((Activity) context).finish();
+			}
+		});
+		back.setOnClickListener(new OnClickListener() {
+
+			@Override
+			public void onClick(View arg0) {
+				((Activity) context).finish();
+			}
+		});
+
 	}
 
 	/**

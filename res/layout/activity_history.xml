@@ -8,33 +8,43 @@
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
-    tools:context=".HistoryActivity" 
-    android:background="@android:color/darker_gray"
-    >
+    tools:context=".HistoryActivity" >
+
+    <include layout="@layout/back_bar" />
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content" >
 
         <Button
-            android:id="@+id/button1"
+            android:id="@+id/btn_movie"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="浏览过的影片" 
-            android:textSize="20sp"
-            android:background="@android:color/background_light"
-            />
+            android:background="@android:color/darker_gray"
+            android:text="浏览过的影片"
+            android:textSize="20sp" />
 
         <Button
-            android:id="@+id/button2"
+            android:id="@+id/btn_person"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="5dp"
+            android:layout_marginLeft="4dp"
+            android:background="@android:color/darker_gray"
+            android:text="浏览过的影人"
+            android:textSize="20sp" />
+
+        <Button
+            android:id="@+id/btn_clean"
+            android:layout_marginLeft="4dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@android:color/darker_gray"
+            android:text="清空"
             android:textSize="20sp"
-            android:background="@android:color/background_light"
-            android:text="浏览过的影人" />
+             />
 
     </LinearLayout>
-    <include layout="@layout/movie_list"/>
+
+    <include layout="@layout/movie_list" />
 
 </LinearLayout>

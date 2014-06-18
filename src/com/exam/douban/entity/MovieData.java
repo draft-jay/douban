@@ -1,5 +1,7 @@
 package com.exam.douban.entity;
 
+import java.util.List;
+
 import android.graphics.Bitmap;
 /**
  * 电影的数据结构
@@ -8,98 +10,94 @@ import android.graphics.Bitmap;
  */
 public class MovieData {
 	
-	private String mTitle=null;
-	private String mId = null;
-	private String mYear = null;
-	private String mRating = null;
-	private Bitmap mImgSmall = null;
-	private Bitmap mImgMedium = null;
-	private Bitmap mImgLarge = null;
-	private String mTag = null;
-	private String mCountry = null ;
+	private String title=null;
+	private String id = null;
+	private String year = null;
+	private String rating = null;
+	private Bitmap img = null;
+	private String tag = null;
+	private String country = null ;
+	private List<PersonData> castList;
+	private List<PersonData> dirList;
 	
-	
-
-	public Bitmap getmImgLarge() {
-		return mImgLarge;
+	public String getTitle() {
+		return title;
 	}
 
-	public void setmImgLarge(Bitmap mImgLarge) {
-		this.mImgLarge = mImgLarge;
+	public void setTitle(String tiitle) {
+		this.title = tiitle;
 	}
 
-	public Bitmap getmImgSmall() {
-		return mImgSmall;
+	public String getId() {
+		return id;
 	}
 
-	public void setmImgSmall(Bitmap mImgSmall) {
-		this.mImgSmall = mImgSmall;
+	public void setId(String id) {
+		this.id = id;
 	}
 
-	public Bitmap getmImgMedium() {
-		return mImgMedium;
+	public String getYear() {
+		return year;
 	}
 
-	public void setmImgMedium(Bitmap mImgMedium) {
-		this.mImgMedium = mImgMedium;
+	public void setYear(String year) {
+		this.year = year;
 	}
 
-	public String getmId() {
-		return mId;
+	public String getRating() {
+		return rating;
 	}
 
-	public void setmId(String mId) {
-		this.mId = mId;
+	public void setRating(String rating) {
+		this.rating = rating;
 	}
 
-	public String getmTitle() {
-		return mTitle;
+	public Bitmap getImg() {
+		return img;
 	}
 
-	public void setmTitle(String mTitle) {
-		this.mTitle = mTitle;
+	public void setImg(Bitmap img) {
+		this.img = img;
 	}
 
-	public String getmYear() {
-		return mYear;
+	public String getTag() {
+		return tag;
 	}
 
-	public void setmYear(String mYear) {
-		this.mYear = mYear;
+	public void setTag(String tag) {
+		this.tag = tag;
 	}
 
-	public String getmRating() {
-		return mRating;
+	public String getCountry() {
+		return country;
 	}
 
-	public void setmRating(String mRating) {
-		this.mRating = mRating;
+	public void setCountry(String country) {
+		this.country = country;
 	}
 
-
-	public String getmTag() {
-		return mTag;
+	public List<PersonData> getCastList() {
+		return castList;
 	}
 
-	public void setmTag(String mTag) {
-		this.mTag = mTag;
+	public void setCastList(List<PersonData> castList) {
+		this.castList = castList;
 	}
 
-	public String getmCountry() {
-		return mCountry;
+	public List<PersonData> getDirList() {
+		return dirList;
 	}
 
-	public void setmCountry(String mCountry) {
-		this.mCountry = mCountry;
+	public void setDirList(List<PersonData> dirList) {
+		this.dirList = dirList;
 	}
-
 
 	public MovieData() {
 		// TODO Auto-generated constructor stub
 	}
 	
 	public void print(){
-		System.out.println("id--"+mId+"---title--"+mTitle);
+		System.out.println("id--"+id+"---title--"+title);
 	}
 
 }

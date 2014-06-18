@@ -3,10 +3,12 @@ package com.exam.douban.adapter;
 import java.util.List;
 import java.util.zip.Inflater;
 
+import com.exam.douban.activity.HistoryActivity;
 /**
  * 自定义适配器
  */
 import com.exam.douban.entity.MovieData;
+import com.exam.douban.entity.PersonData;
 import com.exam.douban.util.Util;
 import com.exam.douban_movie_get.R;
 
@@ -21,17 +23,28 @@ import android.widget.TextView;
 public class MovieAdapter extends BaseAdapter {
 	private Context context;
 	private List<MovieData> ml;
+	private List<PersonData> pl;
 	private boolean busy = true;
+	private String info;
 	
 	public MovieAdapter(Context context,List<MovieData> movieList) {
 		this.context = context;
 		ml = movieList;
 	}
 
+	public MovieAdapter(HistoryActivity context2, List<PersonData> personList) {
+		// TODO Auto-generated constructor stub
+		this.context = context2;
+		pl = personList;
+	}
+
 	@Override
 	public int getCount() {
-		// TODO Auto-generated method stub
+		if(ml!=null)
 		return ml.size();
+		else if(pl!=null)
+			return pl.size();
+		return 0;
 	}
 	/**
 	 * 文字加载完的flag
@@ -67,18 +80,31 @@ public class MovieAdapter extends BaseAdapter {
 		// TODO Auto-generated method stub
 		
 		convertView = LayoutInflater.from(context).inflate(R.layout.search_row,null);
-		TextView title = (TextView) convertView.findViewById(R.id.tv_row_search_title);
-		TextView rating = (TextView) convertView.findViewById(R.id.tv_row_search_rating);
-		TextView year = (TextView) convertView.findViewById(R.id.tv_row_searc_date);
+		TextView title = (TextView) convertView.findViewById(R.id.tv_row_search);
 		ImageView cover = (ImageView) convertView.findViewById(R.id.img_row_search);
-
-		title.setText(ml.get(position).getmTitle());
-		rating.setText(ml.get(position).getmRating());
-		year.setText(ml.get(position).getmYear());
+		if(ml!=null){
+			String t = ml.get(position).getTitle();
+			String y = ml.get(position).getRating();
+			String c = ml.get(position).getYear();
+			title.setText(t+"\n"+y+"\n"+c);
+			cover.setImageBitmap(ml.get(position).getImg());
+		}
+		if(pl!=null){
+			String t = pl.get(position).getName();
+			String y = pl.get(position).getName_en();
+			String c = pl.get(position).getBorn_place();
+			title.setText(t+"\n"+y+"\n"+"出生地："+c);
+			cover.setImageBitmap(pl.get(position).getImg());
+		}
 		
-		cover.setImageBitmap(ml.get(position).getmImgSmall());
 		
 		return convertView;
 	}
-
+	
+	public String getInfo(){
+		return info;
+	}
+	public void setInfo(String s){
+		info = s;
+	}
 }

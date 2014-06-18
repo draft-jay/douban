@@ -16,7 +16,7 @@
         <activity
             android:name="com.exam.douban.activity.MainActivity"
             android:label="@string/title_activity_main" >
-            <intent-filter>
+           <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
@@ -29,6 +29,7 @@
         <activity
             android:name="com.exam.douban.activity.HistoryActivity"
             android:label="@string/title_activity_history" >
+        	 
         </activity>
         <activity
             android:name="com.exam.douban.activity.PersonDetailActivity"
