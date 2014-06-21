@@ -2,6 +2,7 @@ package com.exam.douban.util;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -10,6 +11,8 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -30,6 +33,8 @@ import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.os.Handler;
+import android.os.Message;
 import android.text.Layout;
 import android.util.JsonReader;
 import android.util.Log;
@@ -46,9 +51,11 @@ import android.widget.LinearLayout.LayoutParams;
  * 工具类
  */
 public class Util {
+	
 
 	/**
 	 * 保存正在浏览的条目
+	 * 
 	 * @param context
 	 * @param type
 	 * @param movieInfo
@@ -66,138 +73,69 @@ public class Util {
 		// 读取历史记录
 	}
 
+	
+	
+
+	
+
 	/**
-	 * 这里Intent跳转会报错，不知如何解决
+	 * 顶部返回按钮的监听方法
 	 * 
-	 * @param id
-	 * @param img
-	 * @param text
+	 * @param back
+	 * @param home
 	 * @param context
-	 * @return
 	 */
-	public ViewGroup showPersonOrMoive(final String id, Bitmap img,
-			String text, final Context context) {
-
-		LinearLayout lin = new LinearLayout(context.getApplicationContext());
-		LayoutParams lp = new LayoutParams(LayoutParams.WRAP_CONTENT,
-				LayoutParams.WRAP_CONTENT);
-		lin.setOrientation(LinearLayout.VERTICAL);
-
-		ImageView iv = new ImageView(context.getApplicationContext());
-		iv.setImageBitmap(img);
-		iv.setOnClickListener(new OnClickListener() {
+	public void backClick(Button back, Button home, final Context context) {
+		// TODO Auto-generated method stub
+		home.setOnClickListener(new OnClickListener() {
 			@Override
-			public void onClick(View v) {
-				Intent intent = new Intent(context.getApplicationContext(),
-						PersonDetailActivity.class);
-				intent.putExtra("url", id);
-				context.startActivity(intent);
+			public void onClick(View arg0) {
+				context.startActivity(new Intent(context, MainActivity.class));
+				((Activity) context).finish();
 			}
 		});
-		lin.addView(iv, lp);// addView(view,params)params对应view的布局
+		back.setOnClickListener(new OnClickListener() {
 
-		TextView tv = new TextView(context.getApplicationContext());
-		tv.setTextAppearance(context.getApplicationContext(),
-				android.R.attr.textAppearanceLarge);
-		tv.setText(text);
-		lin.addView(tv, lp);
-		Log.i("OUTPUT", "布局完成");
-		return lin;
+			@Override
+			public void onClick(View arg0) {
+				((Activity) context).finish();
+			}
+		});
+
 	}
 
-	public String download(String urlstr) {
-		StringBuffer sBuffer = new StringBuffer();
-		try {
-			URL url = new URL(urlstr);
-			System.out.println(urlstr);
-			HttpURLConnection connection = (HttpURLConnection) url
-					.openConnection();
-			connection.setReadTimeout(3000);
-			connection.setRequestMethod("GET");
+	/**
+	 * 向豆瓣发出请求，返回字符串数据
+	 * 
+	 * @param urlstr
+	 * @return
+	 * @throws IOException
+	 */
+	public String download(String urlstr) throws IOException {
 
-			String line;
-			InputStreamReader isr = new InputStreamReader(
-					connection.getInputStream(), "UTF-8");
+		URL url = new URL(urlstr);
+		System.out.println(urlstr);
+		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+		connection.setReadTimeout(3000);
+		connection.setRequestMethod("GET");
+
+		String line;
+		// connection.getInputStream()就是返回请求来的数据,虽然返回数据应该不大，还是使用缓存读取吧
+		InputStreamReader isr = new InputStreamReader(connection.getInputStream(), "UTF-8");
+		if(isr != null){
 			BufferedReader buffer = new BufferedReader(isr);
-			System.out.println("response code---"
-					+ connection.getResponseCode());
+			Log.i("Response Code", connection.getResponseCode() + "");
+			StringBuffer sBuffer = new StringBuffer();
 			while ((line = buffer.readLine()) != null) {
 				sBuffer.append(line);
 			}
-			// isr.close();
-			connection.disconnect();
-		} catch (Exception e) {
-			Log.i("OUT PUT", "download error");
-			e.printStackTrace();
-
-		}
-		return sBuffer.toString();
+			return sBuffer.toString();
+		}else
+			return "ERROR";
 	}
-
+	
 	/**
-	 * 接受图片url，返回bit
-	 * 
-	 * @param bmurl
-	 * @return 图片数据
-	 */
-	public Bitmap downloadImg(String bmurl) {
-		Bitmap bm = null;
-		InputStream is = null;
-		BufferedInputStream bis = null;
-		try {
-			URL url = new URL(bmurl);
-			URLConnection connection = url.openConnection();
-			bis = new BufferedInputStream(connection.getInputStream());
-			bm = BitmapFactory.decodeStream(bis);
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				if (bis != null)
-					bis.close();
-				if (is != null)
-					is.close();
-			} catch (Exception e) {
-				e.printStackTrace();
-			}
-		}
-		return bm;
-	}
-
-	/**
-	 * 解析出演员和导演的信息，因为这两个信息格式是一样的
-	 * 
-	 * @param s
-	 * @param title
-	 * @return List<PersonData>
-	 */
-	public List<PersonData> parsePersonArray(JSONObject s, String title) {
-		List<PersonData> avatars = new ArrayList<PersonData>();
-		JSONArray dir;
-		try {
-			dir = s.getJSONArray(title);
-			for (int j = 0; j < dir.length(); j++) {
-				JSONObject d = dir.getJSONObject(j);
-				PersonData cast = new PersonData();
-				cast.setName(d.getString("name"));
-
-				JSONObject a = d.getJSONObject("avatars");// 演员头像
-				cast.setImg(downloadImg(a.getString("medium")));
-
-				cast.setId(d.getString("id"));// 演员id
-				avatars.add(cast);
-
-			}
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return avatars;
-	}
-
-	/**
-	 * 解析电影条目信息（简版）
-	 * 
+	 * 解析搜索返回的电影条目信息（简版）
 	 * @param s
 	 * @param str
 	 * @param imgType
@@ -227,7 +165,7 @@ public class Util {
 				movie.setRating(rating.getString("average"));// 表示评到几分
 
 				JSONObject images = m.getJSONObject("images");
-				movie.setImg(downloadImg(images.getString(imgType)));
+				movie.setImgUrl(images.getString(imgType));
 				list.add(movie);
 				movie.print();
 			}
@@ -237,58 +175,5 @@ public class Util {
 		return list;
 	}
 
-	/**
-	 * 顶部返回按钮的监听方法
-	 * 
-	 * @param back
-	 * @param home
-	 * @param context
-	 */
-	public void backClick(Button back, Button home, final Context context) {
-		// TODO Auto-generated method stub
-		home.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View arg0) {
-				context.startActivity(new Intent(context, MainActivity.class));
-				((Activity) context).finish();
-			}
-		});
-		back.setOnClickListener(new OnClickListener() {
-
-			@Override
-			public void onClick(View arg0) {
-				((Activity) context).finish();
-			}
-		});
-
-	}
-
-	/**
-	 * 解析jsonarray数据到string
-	 * 
-	 * @param arr
-	 * @return 字符串
-	 */
-	// public String parseJSONArraytoString(JSONArray arr) {
-	// StringBuffer str = new StringBuffer();
-	//
-	// for (int i = 0; i < arr.length(); i++) {
-	// try {
-	// str = str.append(arr.getString(i)).append(" ");
-	// Log.i("parse Json line", arr.getString(i));
-	// }
-	// } catch (Exception e) {
-	// e.printStackTrace();
-	// }
-	// }
-	// return str.toString();
-	// }
-	/**
-	 * 把数据放到Movie数据结构里
-	 * 
-	 * @param str
-	 *            json格式的字符串
-	 * @return MovieData
-	 */
 
 }

@@ -5,6 +5,7 @@ import java.util.List;
 import android.graphics.Bitmap;
 /**
  * 电影的数据结构
+ * 以目前的功能来看，似乎不需要把影人的资料单独写个类
  * @author 
  *
  */
@@ -14,12 +15,22 @@ public class MovieData {
 	private String id = null;
 	private String year = null;
 	private String rating = null;
-	private Bitmap img = null;
+	private String imgUrl = null;
 	private String tag = null;
 	private String country = null ;
 	private List<PersonData> castList;
 	private List<PersonData> dirList;
 	
+	
+	
+	public String getImgUrl() {
+		return imgUrl;
+	}
+
+	public void setImgUrl(String imgUrl) {
+		this.imgUrl = imgUrl;
+	}
+
 	public String getTitle() {
 		return title;
 	}
@@ -52,13 +63,6 @@ public class MovieData {
 		this.rating = rating;
 	}
 
-	public Bitmap getImg() {
-		return img;
-	}
-
-	public void setImg(Bitmap img) {
-		this.img = img;
-	}
 
 	public String getTag() {
 		return tag;

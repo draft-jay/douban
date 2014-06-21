@@ -3,16 +3,22 @@ package com.exam.douban.adapter;
 import java.util.List;
 import java.util.zip.Inflater;
 
+import com.exam.douban.activity.DetailActivity;
+import com.exam.douban.activity.MainActivity;
 import com.exam.douban.activity.HistoryActivity;
-/**
- * 自定义适配器
- */
+import com.exam.douban.activity.PersonDetailActivity;
 import com.exam.douban.entity.MovieData;
 import com.exam.douban.entity.PersonData;
+import com.exam.douban.loader.ImgLoader;
 import com.exam.douban.util.Util;
 import com.exam.douban_movie_get.R;
 
+import android.app.Activity;
 import android.content.Context;
+import android.graphics.Bitmap;
+import android.graphics.Movie;
+import android.os.Handler;
+import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -22,19 +28,19 @@ import android.widget.TextView;
 
 public class MovieAdapter extends BaseAdapter {
 	private Context context;
-	private List<MovieData> ml;
-	private List<PersonData> pl;
-	private boolean busy = true;
+	private List<MovieData> ml = null;
+	private List<PersonData> pl = null;
+//	private boolean busy = false;
 	private String info;
+	private ImgLoader imgLoader;
 	
 	public MovieAdapter(Context context,List<MovieData> movieList) {
 		this.context = context;
 		ml = movieList;
 	}
 
-	public MovieAdapter(HistoryActivity context2, List<PersonData> personList) {
-		// TODO Auto-generated constructor stub
-		this.context = context2;
+	public MovieAdapter(HistoryActivity context, List<PersonData> personList) {
+		this.context = context;
 		pl = personList;
 	}
 
@@ -50,9 +56,9 @@ public class MovieAdapter extends BaseAdapter {
 	 * 文字加载完的flag
 	 * @param busy
 	 */
-	public void setFlagBusy(boolean busy) {
-		this.busy = busy;
-	}
+//	public void setFlagBusy(boolean busy) {
+//		this.busy = busy;
+//	}
 
 	@Override
 	public Object getItem(int arg0) {
@@ -65,7 +71,17 @@ public class MovieAdapter extends BaseAdapter {
 		// TODO Auto-generated method stub
 		return 0;
 	}
-
+//	ImageView cover;
+	Handler h = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			super.handleMessage(msg);
+			Bitmap bm = (Bitmap) msg.obj;
+			int id = msg.arg1;
+			View view = LayoutInflater.from(context).inflate(R.layout.search_row,null);
+			ImageView cover = (ImageView) view.findViewById(R.id.img_row_search);
+			cover.setImageBitmap(bm);
+		}};
 	@Override
 	/**
 	 * 在这里把拿到到的<MovieData>格式的列表数据以search_row.xml的方式排列在activity_main.xml
@@ -78,24 +94,30 @@ public class MovieAdapter extends BaseAdapter {
 	 */
 	public View getView(int position, View convertView, ViewGroup arg2) {
 		// TODO Auto-generated method stub
-		
 		convertView = LayoutInflater.from(context).inflate(R.layout.search_row,null);
 		TextView title = (TextView) convertView.findViewById(R.id.tv_row_search);
 		ImageView cover = (ImageView) convertView.findViewById(R.id.img_row_search);
+		System.out.println("postion--"+position);
+		
 		if(ml!=null){
-			String t = ml.get(position).getTitle();
-			String y = ml.get(position).getRating();
-			String c = ml.get(position).getYear();
-			title.setText(t+"\n"+y+"\n"+c);
-			cover.setImageBitmap(ml.get(position).getImg());
+			imgLoader = new ImgLoader(context,h, ml);
+			MovieData movie = ml.get(position);
+			title.setText(movie.getTitle()+"\n"+"评分："+movie.getRating()+"\n"+"上映时间："+movie.getYear());
+			String url = movie.getImgUrl();
+			imgLoader.displayImg(url,cover);
+//			imgLoader.displayImg(ml.get(position).getImgUrl());
+			
+			
 		}
 		if(pl!=null){
-			String t = pl.get(position).getName();
-			String y = pl.get(position).getName_en();
-			String c = pl.get(position).getBorn_place();
-			title.setText(t+"\n"+y+"\n"+"出生地："+c);
-			cover.setImageBitmap(pl.get(position).getImg());
+			imgLoader = new ImgLoader(h, pl);
+			PersonData person = pl.get(position);
+			String url = person.getImgUrl();
+			imgLoader.displayImg(url,cover);
+			title.setText(person.getName()+"\n"+person.getName_en()+"\n"+"出生地："+person.getBorn_place());
+//			cover.setImageBitmap(pl.get(position).getImg());
 		}
+		
 		
 		
 		return convertView;
@@ -107,4 +129,5 @@ public class MovieAdapter extends BaseAdapter {
 	public void setInfo(String s){
 		info = s;
 	}
+	
 }

@@ -13,9 +13,6 @@ import com.exam.douban.entity.PersonData;
 import com.exam.douban.entity.Properties;
 import com.exam.douban.util.Util;
 import com.exam.douban_movie_get.R;
-import com.exam.douban_movie_get.R.layout;
-import com.exam.douban_movie_get.R.menu;
-import com.exam.douban_movie_get.R.string;
 
 import android.os.Bundle;
 import android.os.Handler;
@@ -53,7 +50,7 @@ public class HistoryActivity extends Activity {
 	private List<MovieData> movieList;
 	private List<PersonData> personList;
 
-	private Handler h = new Handler() {
+	private Handler handler = new Handler() {
 
 		public void handleMessage(Message msg) {
 			if (type.equals(Properties.HISTORY_NAME_PERSON)) {
@@ -130,7 +127,7 @@ public class HistoryActivity extends Activity {
 				if (e.clear().commit()) {
 					Toast.makeText(HistoryActivity.this, "清空成功", 0).show();
 					new Thread(new load()).start();
-					h.sendMessage(new Message());
+					handler.sendMessage(new Message());
 				}
 				// ma = new MovieAdapter(HistoryActivity.this, movieList);
 				// lv.setAdapter(ma);
@@ -158,6 +155,7 @@ public class HistoryActivity extends Activity {
 				try {
 					String url = null;
 					if (type.equals(Properties.HISTORY_NAME_MOVIE)) {
+//						movieList
 						MovieData movie = new MovieData();
 						movie.setId(i.next().toString());// key-value都是一样的
 						url = "https://api.douban.com/v2/movie/subject/"
@@ -171,7 +169,7 @@ public class HistoryActivity extends Activity {
 						JSONObject rating = s.getJSONObject("rating");
 						movie.setRating(rating.getString("average"));// 表示评到几分
 						JSONObject images = s.getJSONObject("images");
-						movie.setImg(util.downloadImg(images.getString("small")));
+//						movie.setImg(util.downloadImg(images.getString("small")));
 						movie.setTitle(s.getString("title"));
 						movieList.add(movie);
 						movie.print();
@@ -184,8 +182,7 @@ public class HistoryActivity extends Activity {
 						JSONObject s = new JSONObject(result);
 
 						JSONObject images1 = s.getJSONObject("avatars");// 头像
-						person.setImg(util.downloadImg(images1
-								.getString("small")));
+//						person.setImg(util.downloadImg(images1.getString("small")));
 						// person.setBirthday(s.getString("birthday"));
 						person.setName(s.getString("name"));
 						person.setName_en(s.getString("name_en"));
@@ -199,7 +196,7 @@ public class HistoryActivity extends Activity {
 				}
 			}
 
-			h.sendMessage(new Message());
+			handler.sendMessage(new Message());
 
 		}
 

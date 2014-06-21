@@ -8,7 +8,7 @@ import android.graphics.Bitmap;
  */
 public class PersonData {
 	private String name=null;
-	private Bitmap img=null;
+	private String imgUrl=null;
 	private String id=null;
 	private String name_en=null;
 	private String gender=null;
@@ -18,6 +18,12 @@ public class PersonData {
 	
 	
 	
+	public String getImgUrl() {
+		return imgUrl;
+	}
+	public void setImgUrl(String string) {
+		this.imgUrl = string;
+	}
 	public List<MovieData> getWorks() {
 		return works;
 	}
@@ -53,12 +59,6 @@ public class PersonData {
 	}
 	public void setName(String name) {
 		this.name = name;
-	}
-	public Bitmap getImg() {
-		return img;
-	}
-	public void setImg(Bitmap img) {
-		this.img = img;
 	}
 	public String getId() {
 		return id;

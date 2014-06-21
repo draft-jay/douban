@@ -11,6 +11,7 @@ import org.w3c.dom.Text;
 import com.exam.douban.entity.MovieData;
 import com.exam.douban.entity.PersonData;
 import com.exam.douban.entity.Properties;
+import com.exam.douban.loader.ImgLoader;
 import com.exam.douban.util.Util;
 import com.exam.douban_movie_get.R;
 
@@ -45,6 +46,7 @@ public class PersonDetailActivity extends Activity {
 	private Button btn_back;
 	private Button btn_home;
 	private TextView tv_wokes;
+	private ImgLoader imgLoader;
 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -81,8 +83,19 @@ public class PersonDetailActivity extends Activity {
 		Bundle extra = getIntent().getExtras();
 		String id = extra.getString("id");
 		url = "https://api.douban.com/v2/movie/celebrity/" + id;
-
+		
 	}
+	
+	Handler h = new Handler() {
+		@Override
+		public void handleMessage(Message msg) {
+			super.handleMessage(msg);
+			Bitmap bm = (Bitmap) msg.obj;
+			int id = msg.arg1;
+			ImageView iv = (ImageView) findViewById(id);
+			iv.setImageBitmap(bm);
+		}
+	};
 
 	Handler handler = new Handler() {
 		//返回的数据里都没有birthday这个字段
@@ -90,68 +103,17 @@ public class PersonDetailActivity extends Activity {
 		public void handleMessage(Message message) {
 			Info.setText(person.getName() + "\n" + person.getName_en() + "\n\n"
 					+ "生日：" +person.getBirthday()+ "\n" + "出生地" + person.getBorn_place());
-			mImg.setImageBitmap(person.getImg());
-			
-			// 动态布局
-			ArrayList<MovieData> works = (ArrayList<MovieData>)person.getWorks();
-			System.out.println("works ---  "+works.toString());
-			for (int i = 0; i < works.size(); i++) {
-				String id = works.get(i).getId();
-				Bitmap img = works.get(i).getImg();
-				String name = works.get(i).getTitle();
-				ViewGroup layout = showPersonOrMoive(id, img, name);
-				lin_works.addView(layout);
-				System.out.println("dongtaibuju----"+i);
-			}
-			
+//			mImg.setImageBitmap(person.getImg());
+			mImg.setImageResource(R.drawable.img_medium);
+			imgLoader = new ImgLoader(PersonDetailActivity.this,h,PersonDetailActivity.class,person.getWorks());
+			imgLoader.displayImg(person.getImgUrl(), mImg);
+			imgLoader.loadPerson( lin_works);
 			tv_wokes.setVisibility(View.VISIBLE);
 			proDialog.dismiss();
 		};
 	};
 
-	/**
-	 * 返回文字-图片的LinearLayout布局
-	 * 
-	 * @param id
-	 *            点击图片后跳转的url的Id
-	 * @param img
-	 *            要显示的图片
-	 * @param context
-	 * @return
-	 */
-	public ViewGroup showPersonOrMoive(final String id, Bitmap img, String text) {
-
-		LinearLayout lin = new LinearLayout(getApplicationContext());
-		LayoutParams lp = new LayoutParams(LayoutParams.WRAP_CONTENT,
-				LayoutParams.WRAP_CONTENT);
-		lin.setOrientation(LinearLayout.VERTICAL);
-
-		ImageView iv = new ImageView(getApplicationContext());
-		iv.setImageBitmap(img);
-		iv.setOnClickListener(new OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent intent = new Intent(getApplicationContext(),
-						DetailActivity.class);
-				intent.putExtra("id", id);
-				util.saveHistory(getApplicationContext(), Properties.HISTORY_NAME_MOVIE, id);
-				startActivity(intent);
-			}
-		});
-		lin.addView(iv, lp);// addView(view,params)params对应view的布局
-
-		TextView tv = new TextView(getApplicationContext());
-		tv.setTextAppearance(getApplicationContext(),
-				android.R.attr.textAppearanceLarge);
-		tv.setWidth(155);
-		tv.setText(text);
-		// if(text.length()>4){
-		// tv.setText(text.substring(0,4)+"...");
-		// }
-		lin.addView(tv, lp);
-		Log.i("OUTPUT", "布局完成");
-		return lin;
-	}
+	
 
 	/**
 	 * @author 加载数据（下载）
@@ -161,10 +123,7 @@ public class PersonDetailActivity extends Activity {
 		@Override
 		public void run() {
 			try {
-				String result = util.download(url);
-				// String result =
-				// util.download("https://api.douban.com/v2/movie/subject/2049435");
-
+				 String result =util.download(url);
 				Log.i("OUTPUT", "detail personData download completed");
 				Log.i("Download Data", result);
 				parseDetailInfo(result);
@@ -197,7 +156,7 @@ public class PersonDetailActivity extends Activity {
 				Log.i("OUTPUT", "works parse completly");
 
 				JSONObject images1 = s.getJSONObject("avatars");// 头像
-				person.setImg(util.downloadImg(images1.getString("medium")));
+				person.setImgUrl(images1.getString("medium"));
 				// person.setBirthday(s.getString("birthday"));
 				person.setName(s.getString("name"));
 				person.setName_en(s.getString("name_en"));

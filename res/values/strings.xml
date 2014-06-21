@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <string name="app_name">douban_movie_get</string>
-    <string name="title_activity_main">MainActivity</string>
-    <string name="title_activity_detail">DetailActivity</string>
+    <string name="app_name">豆瓣电影搜索</string>
+    <string name="title_activity_main">主界面</string>
+    <string name="title_activity_detail">影片详情</string>
     <string name="action_settings">Settings</string>
     <string name="properties_search_movie_rating_value">value</string>
     <string name="properties_search_movie_title">title</string>
     <string name="properties_search_movie_images">images</string>
     <string name="properties_search_movie_year">year</string>
     <string name="properties_resources_movie_countries">countryes</string>
-    <string name="title_activity_history">HistoryActivity</string>
+    <string name="title_activity_history">历史记录</string>
     <string name="hello_world">Hello world!</string>
     <string name="history_xml_movie">MovieHistory</string>
     <string name="history_xml_person">PersonHistory</string>
-    <string name="title_activity_person_detail">PersonDetailActivity</string>
+    <string name="title_activity_person_detail">影人详情</string>
     
 
 </resources>

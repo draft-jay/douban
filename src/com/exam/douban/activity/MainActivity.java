@@ -1,12 +1,9 @@
 package com.exam.douban.activity;
 
 
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.List;
 
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 import com.exam.douban.adapter.MovieAdapter;
@@ -42,7 +39,7 @@ public class MainActivity extends Activity {
     private Handler handler;
     private ProgressDialog mpd;
     private MovieAdapter ma;
-    private List<MovieData> movieList = new ArrayList<MovieData>();
+    public List<MovieData> movieList;
     private ListView lv;
 	private Util util = new Util();
     
@@ -55,15 +52,16 @@ public class MainActivity extends Activity {
         btn_search=(Button)findViewById(R.id.btn_search);
         btn_history=(Button)findViewById(R.id.btn_history);
         lv = (ListView) findViewById(R.id.lv_show);
+        
         Listener();
+        
         handler=	new Handler(){
             @Override
             public void handleMessage(Message msg) {
                 // TODO Auto-generated method stub
                 super.handleMessage(msg);
-                ma = new MovieAdapter(MainActivity.this, movieList);
+                ma = new MovieAdapter(MainActivity.this,movieList);
                 lv.setAdapter(ma);
-                ma.notifyDataSetChanged();
                 //进度条消失
                 mpd.dismiss();
             }
@@ -143,15 +141,9 @@ public class MainActivity extends Activity {
         	String ch;
 			try {
 				ch = URLEncoder.encode(title, "utf-8");
-				String uString = "http://api.douban.com/v2/movie/search?q=" + ch+"&count=10";
-				String result = util.download(uString);
-				Log.i("Download Data", result);
-				
-				JSONObject s = new JSONObject(result);
-				movieList = util.parseMovieData(s,"subjects","small");
-				
+				String url = "http://api.douban.com/v2/movie/search?q=" + ch+"&count=10";
+				movieList = downloadMain(url,Properties.SEARCH_NAME_MOVIE);
 				Log.i("OUTPUT", "parse completly");
-//			Toast.makeText(MainActivity.this, "下载失败", 0).show();
 				//给主线程UI界面发消息，提醒下载信息，解析信息完毕
 				Message msg=new Message();
 //            msg.obj=movie;
@@ -162,6 +154,26 @@ public class MainActivity extends Activity {
 			}
         }
     }
+	/**
+	 * 下载主界面的文本信息、图片的url
+	 * @param urlstr
+	 * @return 返回存有电影数据实体的列表（arrayList）
+	 */
+	public List<MovieData> downloadMain(String urlstr,String type) {
+		
+		String sBuffer = null;
+		try {
+			sBuffer = util.download(urlstr);
+			JSONObject json = new JSONObject(sBuffer.toString());
+			movieList = util.parseMovieData(json,"subjects","small");
+		} catch (Exception e) {
+			e.printStackTrace();
+			Log.i("OUT PUT", "download error");
+		}
+		Log.i("Download Data",  sBuffer.toString());
+//		Log.i("Download MainLoader","success");
+		return movieList;
+	}
     
 
 }
