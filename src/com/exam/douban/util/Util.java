@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
@@ -18,7 +19,7 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import com.exam.douban.activity.DetailActivity;
+import com.exam.douban.activity.MovieDetailActivity;
 import com.exam.douban.activity.HistoryActivity;
 import com.exam.douban.activity.MainActivity;
 import com.exam.douban.activity.PersonDetailActivity;
@@ -51,7 +52,6 @@ import android.widget.LinearLayout.LayoutParams;
  * 工具类
  */
 public class Util {
-	
 
 	/**
 	 * 保存正在浏览的条目
@@ -68,15 +68,10 @@ public class Util {
 		Log.i("movieInfo", movieInfo);
 
 		if (editor.commit())
-			Log.i("MainActivity", "历史记录成功");
+			Log.i("", "历史记录成功");
 
 		// 读取历史记录
 	}
-
-	
-	
-
-	
 
 	/**
 	 * 顶部返回按钮的监听方法
@@ -90,8 +85,8 @@ public class Util {
 		home.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				context.startActivity(new Intent(context, MainActivity.class));
 				((Activity) context).finish();
+				context.startActivity(new Intent(context, MainActivity.class));
 			}
 		});
 		back.setOnClickListener(new OnClickListener() {
@@ -111,31 +106,44 @@ public class Util {
 	 * @return
 	 * @throws IOException
 	 */
-	public String download(String urlstr) throws IOException {
+	public String download(String urlstr) {
 
-		URL url = new URL(urlstr);
-		System.out.println(urlstr);
-		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-		connection.setReadTimeout(3000);
-		connection.setRequestMethod("GET");
+		try {
+			URL url = new URL(urlstr);
+			System.out.println(urlstr);
+			HttpURLConnection connection = (HttpURLConnection) url
+					.openConnection();
+			connection.setReadTimeout(3000);
+			connection.setRequestMethod("GET");
 
-		String line;
-		// connection.getInputStream()就是返回请求来的数据,虽然返回数据应该不大，还是使用缓存读取吧
-		InputStreamReader isr = new InputStreamReader(connection.getInputStream(), "UTF-8");
-		if(isr != null){
-			BufferedReader buffer = new BufferedReader(isr);
-			Log.i("Response Code", connection.getResponseCode() + "");
-			StringBuffer sBuffer = new StringBuffer();
-			while ((line = buffer.readLine()) != null) {
-				sBuffer.append(line);
-			}
-			return sBuffer.toString();
-		}else
-			return "ERROR";
+			String line;
+			// connection.getInputStream()就是返回请求来的数据,虽然返回数据应该不大，还是使用缓存读取吧
+			InputStreamReader isr;
+
+			isr = new InputStreamReader(connection.getInputStream(), "UTF-8");
+
+			if (isr != null) {
+				BufferedReader buffer = new BufferedReader(isr);
+				Log.i("Response Code", connection.getResponseCode() + "");
+				StringBuffer sBuffer = new StringBuffer();
+				while ((line = buffer.readLine()) != null) {
+					sBuffer.append(line);
+				}
+				return sBuffer.toString();
+			} 
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return "ERROR";
 	}
-	
+
 	/**
 	 * 解析搜索返回的电影条目信息（简版）
+	 * 和人物的作品信息格式类似
 	 * @param s
 	 * @param str
 	 * @param imgType
@@ -174,6 +182,5 @@ public class Util {
 		}
 		return list;
 	}
-
 
 }

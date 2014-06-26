@@ -4,7 +4,10 @@ import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
@@ -12,10 +15,11 @@ import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-import com.exam.douban.activity.DetailActivity;
+import com.exam.douban.activity.MovieDetailActivity;
 import com.exam.douban.activity.HistoryActivity;
 import com.exam.douban.activity.MainActivity;
 import com.exam.douban.activity.PersonDetailActivity;
+import com.exam.douban.cache.ImgFileCache;
 import com.exam.douban.entity.MovieData;
 import com.exam.douban.entity.PersonData;
 import com.exam.douban.entity.Properties;
@@ -39,45 +43,47 @@ import android.widget.TextView;
 import android.widget.LinearLayout.LayoutParams;
 
 /**
- * 只获取10条结果，不考虑栈空间、内存
+ * 只获取10条结果，图片保存在文件缓存中
  */
 public class ImgLoader {
 	private Context context;
 	private Util util = new Util();
-	private Handler handl;
+//	private Handler handl;
 	List<MovieData> movieList = null;
 	List<PersonData> personList = null;
 	ExecutorService executorService;
 	Class<?> targetCls;
+	private ImgFileCache fileCache= new ImgFileCache() ;
 
-	public ImgLoader(PersonDetailActivity context, Handler handl, Class<?> cls,
+	public ImgLoader(PersonDetailActivity context, Class<?> cls,
 			List<MovieData> list) {
 		executorService = Executors.newFixedThreadPool(5);
 		this.context = context;
-		this.handl = handl;
+//		this.handl = handl;
 		this.targetCls = cls;
 		movieList = list;
+		
 
 	}
 
-	public ImgLoader(DetailActivity context, Handler handl, Class<?> cls,
+	public ImgLoader(MovieDetailActivity context, Class<?> cls,
 			List<PersonData> list) {
 		executorService = Executors.newFixedThreadPool(5);
 		this.context = context;
-		this.handl = handl;
+//		this.handl = handl;
 		this.targetCls = cls;
 		personList = list;
 	}
 	
-	public ImgLoader(Context context,Handler handl,List<MovieData> list) {
+	public ImgLoader(Context context,List<MovieData> list) {
 		executorService = Executors.newFixedThreadPool(5);
-		this.handl = handl;
+//		this.handl = handl;
 		movieList = list;
 	}
 
-	public ImgLoader(Handler handl,List<PersonData> list) {
+	public ImgLoader(List<PersonData> list) {
 		executorService = Executors.newFixedThreadPool(5);
-		this.handl = handl;
+//		this.handl = handl;
 		personList = list;
 	}
 
@@ -87,15 +93,14 @@ public class ImgLoader {
 	 * @param list
 	 * @param lin
 	 */
-	public void loadPerson(LinearLayout lin) {
+	public void loadLayout(LinearLayout lin) {
 		
 		if (movieList != null) {
 			for (int i = 0; i < movieList.size(); i++) {
-				System.out.println(i);
 				String id = movieList.get(i).getId();
 				String title = movieList.get(i).getTitle();
 				String imgurl = movieList.get(i).getImgUrl();
-				ViewGroup layout = showPerson(id, imgurl, title);// 返回布局对象
+				ViewGroup layout = showLayout(id, imgurl, title,Properties.HISTORY_NAME_MOVIE);// 返回布局对象
 				lin.addView(layout);
 			}
 		}
@@ -104,7 +109,7 @@ public class ImgLoader {
 				String id = personList.get(i).getId();
 				String name = personList.get(i).getName();
 				String imgurl = personList.get(i).getImgUrl();
-				ViewGroup layout = showPerson(id, imgurl, name);// 返回布局对象
+				ViewGroup layout = showLayout(id, imgurl, name,Properties.HISTORY_NAME_PERSON);// 返回布局对象
 				lin.addView(layout);
 			}
 		}
@@ -132,7 +137,7 @@ public class ImgLoader {
 	 * @param context
 	 * @return
 	 */
-	public ViewGroup showPerson(final String id, String imgurl, String text) {
+	public ViewGroup showLayout(final String id, String imgurl, String text,final String histotyType) {
 
 		LinearLayout lin = new LinearLayout(context);
 		LayoutParams lp = new LayoutParams(LayoutParams.WRAP_CONTENT,
@@ -151,7 +156,7 @@ public class ImgLoader {
 			public void onClick(View v) {
 				Intent intent = new Intent(context, targetCls);
 				intent.putExtra("id", id);
-				util.saveHistory(context, Properties.HISTORY_NAME_PERSON, id);
+				util.saveHistory(context, histotyType, id);
 				context.startActivity(intent);
 			}
 		});
@@ -214,19 +219,41 @@ public class ImgLoader {
 	 * @param imgurl
 	 */
 	public  Bitmap downloadImg(String imgUrl) {
+		File file = fileCache.getFile(imgUrl);
+		System.out.println("file path---"+file.getPath());
+		Bitmap b = null;
+		
+		if(file != null && file.exists()){
+			FileInputStream fis;
+			try {
+				fis = new FileInputStream(file);
+				b = BitmapFactory.decodeStream(fis);
+			} catch (FileNotFoundException e) {
+				e.printStackTrace();
+				Log.e("FileNotFoundException ---",e.getMessage());
+			}
+		}
+		if(b != null){
+			return b;
+		}
+		
 		try {
 			Bitmap bitMap = null;
 			URL url = new URL(imgUrl);
 			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
 			conn.setInstanceFollowRedirects(true);//重定向跳转
 			
-			BufferedInputStream bis = new BufferedInputStream(conn.getInputStream());
-			bitMap = BitmapFactory.decodeStream(bis);
-//			System.out.println("downloadImgurl----"+imgUrl);
-			Log.i("downloadImgurl",imgUrl);
+			InputStream is = conn.getInputStream();
+			FileOutputStream fos = new FileOutputStream(file);
+			CopyStream(is,fos);
+//			bitMap = BitmapFactory.decodeStream(bis);
+			
+			FileInputStream fis = new FileInputStream(file);
+			bitMap = BitmapFactory.decodeStream(fis);
+			fos.close();
 			return bitMap;
-		} catch (Exception e) {
-			Log.i("download state","error");
+		} catch (IOException e) {
+			Log.e("getBitmap catch Exception...", e.getMessage());
 			e.printStackTrace();
 			return null;
 		}
@@ -249,8 +276,9 @@ public class ImgLoader {
 		}
 
 		public void run() {
-			if (bitmap != null)
+			if (bitmap != null){
 				photoToLoad.imageView.setImageBitmap(bitmap);
+			}
 			else
 				System.out.println("bitmap is null");
 
@@ -273,6 +301,25 @@ public class ImgLoader {
 		public PhotoToLoad(String imgUrl, ImageView iv) {
 			this.imgUrl = imgUrl;
 			imageView = iv;
+		}
+	}
+	public void CopyStream(InputStream is, OutputStream os) {
+		final int buffer_size = 1024;
+		try {
+			byte[] bytes = new byte[buffer_size];
+			for (;;) {
+				int count = is.read(bytes, 0, buffer_size);
+				if (count == -1)
+					break;
+				os.write(bytes, 0, count);
+			}
+			int count = 1;;
+			while(count != -1){
+				count = is.read(bytes,0,buffer_size);//count是实际读入的数据量，没有数据时返回-1
+				os.write(bytes,0,count);			 //所以最后一次不够1024个字节的数据，实际数量是count，所以这里用count。
+			}
+		} catch (Exception ex) {
+			Log.e("CopyStream catch Exception...", "");
 		}
 	}
 

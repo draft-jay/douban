@@ -110,7 +110,7 @@ public class MainActivity extends Activity {
 				System.out.println("ma.getInfo()----"+m.getId());
 				
 				Intent intent = new Intent();
-				intent.setClass(MainActivity.this, DetailActivity.class);
+				intent.setClass(MainActivity.this, MovieDetailActivity.class);
 				intent.putExtra("id", m.getId());
 				startActivity(intent);
 				

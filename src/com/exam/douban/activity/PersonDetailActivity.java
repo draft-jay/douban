@@ -30,6 +30,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 import android.widget.LinearLayout.LayoutParams;
 
 public class PersonDetailActivity extends Activity {
@@ -83,37 +84,46 @@ public class PersonDetailActivity extends Activity {
 		Bundle extra = getIntent().getExtras();
 		String id = extra.getString("id");
 		url = "https://api.douban.com/v2/movie/celebrity/" + id;
-		
+
 	}
-	
-	Handler h = new Handler() {
-		@Override
-		public void handleMessage(Message msg) {
-			super.handleMessage(msg);
-			Bitmap bm = (Bitmap) msg.obj;
-			int id = msg.arg1;
-			ImageView iv = (ImageView) findViewById(id);
-			iv.setImageBitmap(bm);
-		}
-	};
+
+	// Handler h = new Handler() {
+	// @Override
+	// public void handleMessage(Message msg) {
+	// super.handleMessage(msg);
+	// Bitmap bm = (Bitmap) msg.obj;
+	// int id = msg.arg1;
+	// ImageView iv = (ImageView) findViewById(id);
+	// iv.setImageBitmap(bm);
+	// }
+	// };
 
 	Handler handler = new Handler() {
-		//返回的数据里都没有birthday这个字段
+		// 返回的数据里都没有birthday这个字段
 		@Override
 		public void handleMessage(Message message) {
+			if (message.arg1 == 0) {
+				proDialog.dismiss();
+				Toast.makeText(getApplicationContext(), "加载失败",
+						Toast.LENGTH_SHORT).show();
+				// ((Activity) getApplicationContext()).finish();
+				finish();
+			}
+
 			Info.setText(person.getName() + "\n" + person.getName_en() + "\n\n"
-					+ "生日：" +person.getBirthday()+ "\n" + "出生地" + person.getBorn_place());
-//			mImg.setImageBitmap(person.getImg());
+					+ "生日：" + person.getBirthday() + "\n" + "出生地"
+					+ person.getBorn_place());
+			// mImg.setImageBitmap(person.getImg());
 			mImg.setImageResource(R.drawable.img_medium);
-			imgLoader = new ImgLoader(PersonDetailActivity.this,h,PersonDetailActivity.class,person.getWorks());
+			imgLoader = new ImgLoader(PersonDetailActivity.this,
+					MovieDetailActivity.class, person.getWorks());
 			imgLoader.displayImg(person.getImgUrl(), mImg);
-			imgLoader.loadPerson( lin_works);
+			imgLoader.loadLayout(lin_works);
 			tv_wokes.setVisibility(View.VISIBLE);
 			proDialog.dismiss();
+
 		};
 	};
-
-	
 
 	/**
 	 * @author 加载数据（下载）
@@ -123,15 +133,17 @@ public class PersonDetailActivity extends Activity {
 		@Override
 		public void run() {
 			try {
-				 String result =util.download(url);
-				Log.i("OUTPUT", "detail personData download completed");
-				Log.i("Download Data", result);
-				parseDetailInfo(result);
-				Log.i("OUTPUT", "detail person parse completed");
-				handler.sendMessage(new Message());
-				Log.i("OUTPUT", "msg sent completed");
-				
-
+				String result = util.download(url);
+				Message msg = new Message();
+				if (result.equals("ERROR")) {
+					msg.arg1 = 0;
+					handler.sendMessage(msg);
+				} else {
+					parseDetailInfo(result);
+					Log.i("OUTPUT", "detail person parse completed");
+					msg.arg1 = 1;
+					handler.sendMessage(msg);
+				}
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -152,7 +164,7 @@ public class PersonDetailActivity extends Activity {
 			try {
 				JSONObject s = new JSONObject(result);
 
-				person.setWorks(util.parseMovieData(s, "works","medium"));
+				person.setWorks(util.parseMovieData(s, "works", "medium"));
 				Log.i("OUTPUT", "works parse completly");
 
 				JSONObject images1 = s.getJSONObject("avatars");// 头像

@@ -3,7 +3,7 @@ package com.exam.douban.adapter;
 import java.util.List;
 import java.util.zip.Inflater;
 
-import com.exam.douban.activity.DetailActivity;
+import com.exam.douban.activity.MovieDetailActivity;
 import com.exam.douban.activity.MainActivity;
 import com.exam.douban.activity.HistoryActivity;
 import com.exam.douban.activity.PersonDetailActivity;
@@ -72,16 +72,16 @@ public class MovieAdapter extends BaseAdapter {
 		return 0;
 	}
 //	ImageView cover;
-	Handler h = new Handler() {
-		@Override
-		public void handleMessage(Message msg) {
-			super.handleMessage(msg);
-			Bitmap bm = (Bitmap) msg.obj;
-			int id = msg.arg1;
-			View view = LayoutInflater.from(context).inflate(R.layout.search_row,null);
-			ImageView cover = (ImageView) view.findViewById(R.id.img_row_search);
-			cover.setImageBitmap(bm);
-		}};
+//	Handler h = new Handler() {
+//		@Override
+//		public void handleMessage(Message msg) {
+//			super.handleMessage(msg);
+//			Bitmap bm = (Bitmap) msg.obj;
+//			int id = msg.arg1;
+//			View view = LayoutInflater.from(context).inflate(R.layout.search_row,null);
+//			ImageView cover = (ImageView) view.findViewById(R.id.img_row_search);
+//			cover.setImageBitmap(bm);
+//		}};
 	@Override
 	/**
 	 * 在这里把拿到到的<MovieData>格式的列表数据以search_row.xml的方式排列在activity_main.xml
@@ -97,10 +97,9 @@ public class MovieAdapter extends BaseAdapter {
 		convertView = LayoutInflater.from(context).inflate(R.layout.search_row,null);
 		TextView title = (TextView) convertView.findViewById(R.id.tv_row_search);
 		ImageView cover = (ImageView) convertView.findViewById(R.id.img_row_search);
-		System.out.println("postion--"+position);
 		
 		if(ml!=null){
-			imgLoader = new ImgLoader(context,h, ml);
+			imgLoader = new ImgLoader(context, ml);
 			MovieData movie = ml.get(position);
 			title.setText(movie.getTitle()+"\n"+"评分："+movie.getRating()+"\n"+"上映时间："+movie.getYear());
 			String url = movie.getImgUrl();
@@ -110,7 +109,7 @@ public class MovieAdapter extends BaseAdapter {
 			
 		}
 		if(pl!=null){
-			imgLoader = new ImgLoader(h, pl);
+			imgLoader = new ImgLoader(pl);
 			PersonData person = pl.get(position);
 			String url = person.getImgUrl();
 			imgLoader.displayImg(url,cover);

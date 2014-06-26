@@ -59,7 +59,6 @@ public class HistoryActivity extends Activity {
 				ma = new MovieAdapter(HistoryActivity.this, movieList);
 			}
 			lv.setAdapter(ma);
-			System.out.println("shuaxin");
 			// 进度条消失
 			mpd.dismiss();
 		};
@@ -109,7 +108,7 @@ public class HistoryActivity extends Activity {
 			public void onItemClick(AdapterView<?> arg0, View arg1,
 					int position, long arg3) {
 				Intent i = new Intent(HistoryActivity.this,
-						DetailActivity.class);
+						MovieDetailActivity.class);
 				i.putExtra("id", movieList.get(position).getId());
 				startActivity(i);
 			}
@@ -169,7 +168,7 @@ public class HistoryActivity extends Activity {
 						JSONObject rating = s.getJSONObject("rating");
 						movie.setRating(rating.getString("average"));// 表示评到几分
 						JSONObject images = s.getJSONObject("images");
-//						movie.setImg(util.downloadImg(images.getString("small")));
+						movie.setImgUrl(images.getString("small"));
 						movie.setTitle(s.getString("title"));
 						movieList.add(movie);
 						movie.print();
@@ -181,12 +180,12 @@ public class HistoryActivity extends Activity {
 						String result = util.download(url);
 						JSONObject s = new JSONObject(result);
 
-						JSONObject images1 = s.getJSONObject("avatars");// 头像
-//						person.setImg(util.downloadImg(images1.getString("small")));
+						JSONObject images = s.getJSONObject("avatars");// 头像
+						person.setImgUrl(images.getString("small"));
 						// person.setBirthday(s.getString("birthday"));
 						person.setName(s.getString("name"));
 						person.setName_en(s.getString("name_en"));
-						person.setGender(s.getString("born_place"));
+						person.setBorn_place(s.getString("born_place"));
 						person.setId(s.getString("id"));
 						personList.add(person);
 						person.print();
