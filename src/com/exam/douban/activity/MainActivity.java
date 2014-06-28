@@ -106,8 +106,8 @@ public class MainActivity extends Activity {
 					long id) {
 				MovieData m = movieList.get(position);
 				
-				util.saveHistory(MainActivity.this, Properties.HISTORY_NAME_MOVIE, m.getId());
-				System.out.println("ma.getInfo()----"+m.getId());
+				util.saveHistory(getApplicationContext(), Properties.HISTORY_NAME_MOVIE, m.getId());
+//				System.out.println("ma.getInfo()----"+m.getId());
 				
 				Intent intent = new Intent();
 				intent.setClass(MainActivity.this, MovieDetailActivity.class);
@@ -129,19 +129,18 @@ public class MainActivity extends Activity {
 
 	private class DownloadThread extends Thread
     {
-        String title=null ;
+        String title = null ;
         
         public DownloadThread(String title) 
         {
-//				url="https://api.douban.com/v2/movie/search?q="+URLEncoder.encode(title, "utf-8");
-				this.title=title;
+				this.title = title;
         }
         public void run()
         {
-        	String ch;
+        	String path;
 			try {
-				ch = URLEncoder.encode(title, "utf-8");
-				String url = "http://api.douban.com/v2/movie/search?q=" + ch+"&count=10";
+				path = URLEncoder.encode(title, "utf-8");
+				String url = "http://api.douban.com/v2/movie/search?q=" + path+"&count=10";
 				movieList = downloadMain(url,Properties.SEARCH_NAME_MOVIE);
 				Log.i("OUTPUT", "parse completly");
 				//给主线程UI界面发消息，提醒下载信息，解析信息完毕

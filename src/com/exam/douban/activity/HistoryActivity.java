@@ -47,18 +47,24 @@ public class HistoryActivity extends Activity {
 	private ProgressDialog mpd;
 	private String type = "MovieHistory";
 
-	private List<MovieData> movieList;
-	private List<PersonData> personList;
+	private List<MovieData> movieList = null;
+	private List<PersonData> personList = null;
 
 	private Handler handler = new Handler() {
 
 		public void handleMessage(Message msg) {
-			if (type.equals(Properties.HISTORY_NAME_PERSON)) {
-				ma = new MovieAdapter(HistoryActivity.this, personList);
-			} else {
-				ma = new MovieAdapter(HistoryActivity.this, movieList);
-			}
-			lv.setAdapter(ma);
+//			if (movieList == null || personList == null) {
+//				Toast.makeText(getApplicationContext(), "无历史记录",
+//						Toast.LENGTH_SHORT).show();
+//			} else {
+
+				if (type.equals(Properties.HISTORY_NAME_PERSON)) {
+					ma = new MovieAdapter(HistoryActivity.this, personList);
+				} else {
+					ma = new MovieAdapter(HistoryActivity.this, movieList);
+				}
+				lv.setAdapter(ma);
+//			}
 			// 进度条消失
 			mpd.dismiss();
 		};
@@ -107,9 +113,14 @@ public class HistoryActivity extends Activity {
 			@Override
 			public void onItemClick(AdapterView<?> arg0, View arg1,
 					int position, long arg3) {
-				Intent i = new Intent(HistoryActivity.this,
-						MovieDetailActivity.class);
-				i.putExtra("id", movieList.get(position).getId());
+				Intent i = new Intent();
+				if(type.equals(Properties.HISTORY_NAME_MOVIE)){
+					i.setClass(getApplicationContext(), MovieDetailActivity.class);
+					i.putExtra("id", movieList.get(position).getId());
+				}else{
+					i.setClass(getApplicationContext(), PersonDetailActivity.class);
+					i.putExtra("id", personList.get(position).getId());
+				}
 				startActivity(i);
 			}
 		});
@@ -150,16 +161,23 @@ public class HistoryActivity extends Activity {
 			SharedPreferences shared = getSharedPreferences(type,
 					Activity.MODE_PRIVATE);
 			Iterator i = shared.getAll().keySet().iterator();
+//			Message msg = new Message();
+//			msg.arg1 = 1;
 			while (i.hasNext()) {
 				try {
 					String url = null;
 					if (type.equals(Properties.HISTORY_NAME_MOVIE)) {
-//						movieList
+						// movieList
 						MovieData movie = new MovieData();
 						movie.setId(i.next().toString());// key-value都是一样的
 						url = "https://api.douban.com/v2/movie/subject/"
 								+ movie.getId();
 						String result = util.download(url);
+						if (result.equals("ERROR")) {
+//							msg.arg1 = 0;
+							continue;
+						}
+						
 						JSONObject s;
 						s = new JSONObject(result);
 						Log.i("Download Data", result);
@@ -172,12 +190,19 @@ public class HistoryActivity extends Activity {
 						movie.setTitle(s.getString("title"));
 						movieList.add(movie);
 						movie.print();
+
 					} else {
 						PersonData person = new PersonData();
 						person.setId(i.next().toString());
 						url = "https://api.douban.com/v2/movie/celebrity/"
 								+ person.getId();
 						String result = util.download(url);
+
+						if (result.equals("ERROR")) {
+//							msg.arg1 = 0;
+							continue;
+						}
+
 						JSONObject s = new JSONObject(result);
 
 						JSONObject images = s.getJSONObject("avatars");// 头像

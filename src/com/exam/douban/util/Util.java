@@ -58,17 +58,17 @@ public class Util {
 	 * 
 	 * @param context
 	 * @param type
-	 * @param movieInfo
+	 * @param id
 	 */
-	public void saveHistory(Context context, String type, String movieInfo) {
+	public void saveHistory(Context context, String type, String id) {
 		SharedPreferences sharedPreferences = context.getSharedPreferences(
 				type, Activity.MODE_APPEND);
 		SharedPreferences.Editor editor = sharedPreferences.edit();
-		editor.putString(movieInfo, movieInfo);
-		Log.i("movieInfo", movieInfo);
+		editor.putString(id, id);
+		Log.i("movieInfo", id);
 
 		if (editor.commit())
-			Log.i("", "历史记录成功");
+		Log.i("", "历史记录成功");
 
 		// 读取历史记录
 	}
@@ -85,7 +85,7 @@ public class Util {
 		home.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View arg0) {
-				((Activity) context).finish();
+//				((Activity) context).finish();
 				context.startActivity(new Intent(context, MainActivity.class));
 			}
 		});
@@ -117,7 +117,6 @@ public class Util {
 			connection.setRequestMethod("GET");
 
 			String line;
-			// connection.getInputStream()就是返回请求来的数据,虽然返回数据应该不大，还是使用缓存读取吧
 			InputStreamReader isr;
 
 			isr = new InputStreamReader(connection.getInputStream(), "UTF-8");
@@ -131,13 +130,10 @@ public class Util {
 				}
 				return sBuffer.toString();
 			} 
-		} catch (UnsupportedEncodingException e) {
+		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+		} 
 		return "ERROR";
 	}
 

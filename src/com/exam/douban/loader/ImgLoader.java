@@ -1,6 +1,5 @@
 package com.exam.douban.loader;
 
-import java.io.BufferedInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -10,7 +9,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -130,14 +128,12 @@ public class ImgLoader {
 	/**
 	 * 返回文字-图片的LinearLayout布局 动态布局
 	 * 
-	 * @param id
-	 *            点击图片后跳转的url的Id
-	 * @param img
-	 *            要显示的图片
+	 * @param id  点击图片后跳转的url的Id
+	 * @param img 要显示的图片
 	 * @param context
 	 * @return
 	 */
-	public ViewGroup showLayout(final String id, String imgurl, String text,final String histotyType) {
+	public ViewGroup showLayout(final String id, String imgurl, final String name,final String histotyType) {
 
 		LinearLayout lin = new LinearLayout(context);
 		LayoutParams lp = new LayoutParams(LayoutParams.WRAP_CONTENT,
@@ -148,7 +144,6 @@ public class ImgLoader {
 		iv.setBackgroundResource(R.drawable.img_medium);
 		iv.setId(Integer.parseInt(id));
 
-//		displayImg(imgurl, Integer.parseInt(id));
 		displayImg(imgurl, iv);
 
 		iv.setOnClickListener(new OnClickListener() {
@@ -164,7 +159,7 @@ public class ImgLoader {
 
 		TextView tv = new TextView(context);
 		tv.setTextAppearance(context, android.R.attr.textAppearanceLarge);
-		tv.setText(text);
+		tv.setText(name);
 		tv.setWidth(155);
 		lin.addView(tv, lp);
 		Log.i("OUTPUT", "布局完成");
@@ -219,8 +214,9 @@ public class ImgLoader {
 	 * @param imgurl
 	 */
 	public  Bitmap downloadImg(String imgUrl) {
+		
 		File file = fileCache.getFile(imgUrl);
-		System.out.println("file path---"+file.getPath());
+//		System.out.println("file path---"+file.getPath());
 		Bitmap b = null;
 		
 		if(file != null && file.exists()){
